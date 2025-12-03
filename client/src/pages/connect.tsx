@@ -189,6 +189,12 @@ export default function Connect() {
                     </p>
                   </div>
 
+                  {createConnectionMutation.isError && (
+                    <div className="bg-red-500/10 border border-red-500/50 p-4 font-mono text-sm text-red-400">
+                      Error: Failed to create connection. Please try again.
+                    </div>
+                  )}
+
                   <div className="flex justify-between">
                     <button 
                       onClick={() => setStep("SELECT")}
@@ -198,9 +204,10 @@ export default function Connect() {
                     </button>
                     <button 
                       onClick={handleDeploy}
-                      className="bg-primary text-black font-mono font-bold px-8 py-3 hover:bg-white transition-colors uppercase flex items-center gap-2"
+                      disabled={!apiKeyLabel || createConnectionMutation.isPending}
+                      className="bg-primary text-black font-mono font-bold px-8 py-3 hover:bg-white transition-colors uppercase flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Generate & Connect <Wifi className="w-4 h-4" />
+                      {createConnectionMutation.isPending ? "CONNECTING..." : "Generate & Connect"} <Wifi className="w-4 h-4" />
                     </button>
                   </div>
                 </motion.div>
