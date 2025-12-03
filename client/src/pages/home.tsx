@@ -54,11 +54,11 @@ export default function Home() {
           ))}
         </div>
 
-        <button className="bg-primary text-black font-mono font-bold px-6 py-2 text-sm hover:bg-white transition-colors flex items-center gap-2 border border-transparent hover:border-black">
-          <a href="/connect" className="flex items-center gap-2">
+        <a href="/connect">
+          <button className="bg-primary text-black font-mono font-bold px-6 py-2 text-sm hover:bg-white transition-colors flex items-center gap-2 border border-transparent hover:border-black">
             CONNECT <ArrowRight className="w-4 h-4" />
-          </a>
-        </button>
+          </button>
+        </a>
       </nav>
 
       {/* Hero Section */}

@@ -2,42 +2,67 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Terminal, Shield, Zap, Wifi, Activity, CheckCircle2, XCircle, Lock, Globe, Cpu, ArrowRight, Copy } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useMutation } from "@tanstack/react-query";
 
 export default function Connect() {
   const [step, setStep] = useState<"SELECT" | "CONFIG" | "DEPLOY" | "ACTIVE">("SELECT");
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [status, setStatus] = useState("IDLE");
+  const [apiKeyLabel, setApiKeyLabel] = useState("");
+  const [allowedIp, setAllowedIp] = useState("");
+  const [connectionData, setConnectionData] = useState<any>(null);
   
   const addLog = (msg: string) => {
     setLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
   };
 
+  const createConnectionMutation = useMutation({
+    mutationFn: async (data: { label: string; network: string; allowedIp?: string }) => {
+      const response = await fetch("/api/connections", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Failed to create connection");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setConnectionData(data);
+      setStep("DEPLOY");
+      setStatus("INIT");
+      addLog("Initializing handshake protocol...");
+      
+      setTimeout(() => {
+        addLog("Verifying cryptographic keys...");
+        setStatus("VERIFY");
+      }, 1500);
+
+      setTimeout(() => {
+        addLog("Establishing secure tunnel (mTLS)...");
+        setStatus("TUNNEL");
+      }, 3000);
+
+      setTimeout(() => {
+        addLog("Syncing latest block headers...");
+        setStatus("SYNC");
+      }, 4500);
+
+      setTimeout(() => {
+        addLog("Connection established successfully.");
+        setStatus("READY");
+        setStep("ACTIVE");
+      }, 6000);
+    },
+  });
+
   const handleDeploy = () => {
-    setStep("DEPLOY");
-    setStatus("INIT");
-    addLog("Initializing handshake protocol...");
-    
-    setTimeout(() => {
-      addLog("Verifying cryptographic keys...");
-      setStatus("VERIFY");
-    }, 1500);
-
-    setTimeout(() => {
-      addLog("Establishing secure tunnel (mTLS)...");
-      setStatus("TUNNEL");
-    }, 3000);
-
-    setTimeout(() => {
-      addLog("Syncing latest block headers...");
-      setStatus("SYNC");
-    }, 4500);
-
-    setTimeout(() => {
-      addLog("Connection established successfully.");
-      setStatus("READY");
-      setStep("ACTIVE");
-    }, 6000);
+    if (!selectedNode || !apiKeyLabel) return;
+    createConnectionMutation.mutate({
+      label: apiKeyLabel,
+      network: selectedNode,
+      allowedIp: allowedIp || undefined,
+    });
   };
 
   return (
@@ -135,11 +160,23 @@ export default function Connect() {
                     <div className="space-y-4">
                       <div>
                         <label className="block font-mono text-xs mb-2 uppercase">API Key Label</label>
-                        <input type="text" placeholder="My-App-Node-01" className="w-full bg-background border border-border p-3 font-mono text-sm focus:border-primary outline-none transition-colors" />
+                        <input 
+                          type="text" 
+                          placeholder="My-App-Node-01" 
+                          value={apiKeyLabel}
+                          onChange={(e) => setApiKeyLabel(e.target.value)}
+                          className="w-full bg-background border border-border p-3 font-mono text-sm focus:border-primary outline-none transition-colors" 
+                        />
                       </div>
                       <div>
                         <label className="block font-mono text-xs mb-2 uppercase">Allowed IP (Optional)</label>
-                        <input type="text" placeholder="0.0.0.0/0" className="w-full bg-background border border-border p-3 font-mono text-sm focus:border-primary outline-none transition-colors" />
+                        <input 
+                          type="text" 
+                          placeholder="0.0.0.0/0" 
+                          value={allowedIp}
+                          onChange={(e) => setAllowedIp(e.target.value)}
+                          className="w-full bg-background border border-border p-3 font-mono text-sm focus:border-primary outline-none transition-colors" 
+                        />
                       </div>
                     </div>
                   </div>
@@ -205,10 +242,13 @@ export default function Connect() {
                          <div>
                            <label className="block font-mono text-xs mb-2 text-muted-foreground">HTTPS ENDPOINT</label>
                            <div className="flex gap-2">
-                             <code className="bg-black border border-border px-3 py-2 block w-full text-primary">
-                               https://rpc.infra.v1/mainnet/key_8x992...
+                             <code className="bg-black border border-border px-3 py-2 block w-full text-primary overflow-x-auto">
+                               https://rpc.infra.v1/{connectionData?.network}/{connectionData?.apiKey}
                              </code>
-                             <button className="bg-white text-black p-2 hover:bg-primary transition-colors">
+                             <button 
+                               onClick={() => navigator.clipboard.writeText(`https://rpc.infra.v1/${connectionData?.network}/${connectionData?.apiKey}`)}
+                               className="bg-white text-black p-2 hover:bg-primary transition-colors"
+                             >
                                <Copy className="w-4 h-4" />
                              </button>
                            </div>
@@ -217,10 +257,13 @@ export default function Connect() {
                          <div>
                            <label className="block font-mono text-xs mb-2 text-muted-foreground">WEBSOCKET ENDPOINT</label>
                            <div className="flex gap-2">
-                             <code className="bg-black border border-border px-3 py-2 block w-full text-primary">
-                               wss://rpc.infra.v1/ws/mainnet/key_8x992...
+                             <code className="bg-black border border-border px-3 py-2 block w-full text-primary overflow-x-auto">
+                               wss://rpc.infra.v1/ws/{connectionData?.network}/{connectionData?.apiKey}
                              </code>
-                             <button className="bg-white text-black p-2 hover:bg-primary transition-colors">
+                             <button 
+                               onClick={() => navigator.clipboard.writeText(`wss://rpc.infra.v1/ws/${connectionData?.network}/${connectionData?.apiKey}`)}
+                               className="bg-white text-black p-2 hover:bg-primary transition-colors"
+                             >
                                <Copy className="w-4 h-4" />
                              </button>
                            </div>
