@@ -116,6 +116,86 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Capabilities Section */}
+      <section className="border-b border-border">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          <div className="p-8 md:p-16 border-b lg:border-b-0 lg:border-r border-border">
+             <div className="sticky top-24">
+                <p className="font-mono text-primary text-sm mb-4 tracking-widest">[ SYSTEM_CAPABILITIES ]</p>
+                <h2 className="text-5xl md:text-7xl font-black uppercase leading-none mb-8">
+                  ARCHITECT<br/>
+                  THE <span className="text-stroke text-transparent">FUTURE</span>
+                </h2>
+                <p className="font-mono text-muted-foreground text-lg max-w-md mb-12">
+                  Built for high-frequency trading, MEV protection, and zero-knowledge proof generation. This is not just a node provider. It's a weapon.
+                </p>
+                
+                <ul className="space-y-4 font-mono text-sm">
+                  <li className="flex items-center gap-4">
+                    <div className="w-2 h-2 bg-primary" />
+                    <span>99.99% UPTIME SLA GUARANTEED</span>
+                  </li>
+                  <li className="flex items-center gap-4">
+                    <div className="w-2 h-2 bg-primary" />
+                    <span>MULTI-REGION FAILOVER</span>
+                  </li>
+                  <li className="flex items-center gap-4">
+                    <div className="w-2 h-2 bg-primary" />
+                    <span>24/7 ENGINEER SUPPORT CHANNEL</span>
+                  </li>
+                </ul>
+             </div>
+          </div>
+
+          <div className="grid grid-cols-1 border-border">
+            {[
+              {
+                id: "01",
+                title: "Instant Finality",
+                desc: "Sub-second block times with optimistic execution. Your transactions confirm before they even blink.",
+                specs: ["< 400ms Latency", "Optimistic Rollups", "Instant Soft Confirm"]
+              },
+              {
+                id: "02",
+                title: "Infinite Scalability",
+                desc: "Horizontal sharding allows the network to grow with demand. No bottlenecks. No gas wars.",
+                specs: ["Dynamic Sharding", "Auto-Scaling", "Zero Gas Spikes"]
+              },
+              {
+                id: "03",
+                title: "Privacy Native",
+                desc: "Zero-knowledge proofs integrated at the protocol level. Transact freely without being watched.",
+                specs: ["zk-SNARKs", "Private Mempool", "Encrypted State"]
+              },
+              {
+                id: "04",
+                title: "Interchain Bridges",
+                desc: "Native trustless bridges to Ethereum, Solana, and Bitcoin. Move assets without the risk.",
+                specs: ["Trustless Relayers", "Multi-Sig Security", "Instant Settlement"]
+              }
+            ].map((item, i) => (
+              <div key={item.id} className="group border-b border-border last:border-b-0 p-8 md:p-12 hover:bg-white hover:text-black transition-colors duration-300 cursor-crosshair">
+                <div className="flex justify-between items-start mb-6">
+                  <span className="font-mono text-xl font-bold opacity-50">/ {item.id}</span>
+                  <ArrowRight className="w-6 h-6 -rotate-45 group-hover:rotate-0 transition-transform duration-300" />
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold uppercase mb-4">{item.title}</h3>
+                <p className="font-mono text-sm md:text-base opacity-70 group-hover:opacity-100 mb-8 max-w-lg">
+                  {item.desc}
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {item.specs.map(spec => (
+                    <span key={spec} className="font-mono text-xs border border-current px-2 py-1 uppercase">
+                      {spec}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stats Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-b border-border bg-background">
         <Stat label="UPTIME GUARANTEE" value="99.9%" />
