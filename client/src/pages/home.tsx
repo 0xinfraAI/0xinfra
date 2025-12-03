@@ -44,7 +44,11 @@ export default function Home() {
         
         <div className="hidden md:flex items-center gap-8 font-mono text-sm">
           {['NODES', 'RPC', 'STAKING', 'DOCS'].map((item) => (
-            <a key={item} href="#" className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors">
+            <a 
+              key={item} 
+              href={item === 'NODES' ? '/nodes' : item === 'DOCS' ? '/docs' : '#'} 
+              className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors"
+            >
               {item}
             </a>
           ))}
