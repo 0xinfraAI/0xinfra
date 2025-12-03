@@ -104,10 +104,12 @@ export default function Home() {
             <button className="bg-white text-black font-sans font-bold text-xl px-8 py-4 hover:bg-primary transition-colors border border-white hover:border-primary uppercase">
               Start Building
             </button>
-            <button className="bg-transparent text-white font-sans font-bold text-xl px-8 py-4 border border-white hover:bg-white hover:text-black transition-colors uppercase flex items-center gap-3">
-              <Terminal className="w-5 h-5" />
-              Read Docs
-            </button>
+            <a href="/docs">
+              <button className="bg-transparent text-white font-sans font-bold text-xl px-8 py-4 border border-white hover:bg-white hover:text-black transition-colors uppercase flex items-center gap-3 w-full md:w-auto justify-center">
+                <Terminal className="w-5 h-5" />
+                Read Docs
+              </button>
+            </a>
           </motion.div>
         </div>
         
