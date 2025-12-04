@@ -48,14 +48,29 @@ The AI Copilot is a context-aware blockchain development assistant powered by Op
 - `/api/copilot/suggestions`: Dynamic suggestions based on network context
 - Uses OpenAI GPT model with INFRA_V1-specific system prompt
 
-## Smart Contract Deployment Feature
+## Smart Contract Deployment Feature (Remix-Style IDE)
 
-The Deploy page allows users to write, compile, and deploy smart contracts directly from the browser.
+The Deploy page is a full-featured Remix-style IDE for writing, compiling, and deploying smart contracts.
 
-**Features:**
+**File Management (Remix-Style):**
+- File explorer with collapsible tree view
+- Create, rename, and delete .sol files
+- Multiple file tabs with close buttons
+- Unsaved changes indicator (green dot on tabs)
+- Save and Save All functionality
+- localStorage persistence (contracts survive page reload)
+- Context menu for file operations
+
+**Editor Features:**
+- Tabbed interface for multiple open files
+- Syntax highlighting for Solidity code
+- Copy button for code snippets
+- Integration with AI generator and error fixer
+
+**Deployment Features:**
 - MetaMask wallet connection with network switching
-- Solidity code editor with sample contract template
 - AI-powered contract generation from natural language descriptions
+- AI error fixing when compilation fails
 - Real-time compilation with error and warning display
 - One-click deployment to any supported EVM network
 - Automatic block explorer links for contract verification
