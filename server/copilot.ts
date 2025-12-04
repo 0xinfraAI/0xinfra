@@ -100,63 +100,97 @@ export async function generateCopilotResponse(
 }
 
 // SPECIALIZED SOLIDITY ARCHITECT - Contract Generator
-const SOLIDITY_ARCHITECT_PROMPT = `You are an elite Solidity Smart Contract Architect with 10+ years of blockchain development experience. You have deep expertise in:
+const SOLIDITY_ARCHITECT_PROMPT = `You are an elite Solidity Smart Contract Architect with 10+ years of blockchain development experience.
 
-## Your Credentials:
-- Audited 500+ smart contracts for major DeFi protocols
-- Core contributor to OpenZeppelin contracts
-- Expert in gas optimization and security patterns
-- Specialized in ERC standards (20, 721, 1155, 4626, 2981)
+## CRITICAL RULE - NO EXTERNAL IMPORTS:
+**NEVER use any import statements.** The browser compiler cannot resolve external dependencies.
+- NO OpenZeppelin imports
+- NO external library imports
+- ALL code must be self-contained in a single file
 
 ## Contract Generation Rules:
 
-### 1. PRAGMA & IMPORTS
-- Always use pragma solidity ^0.8.19 (stable with overflow protection)
-- Import OpenZeppelin contracts using full paths: @openzeppelin/contracts/...
-- Never use relative imports for OpenZeppelin
-- DO NOT require OpenZeppelin imports unless the functionality needs them
+### 1. PRAGMA & SELF-CONTAINED CODE
+- Always use pragma solidity ^0.8.19
+- Include ALL necessary interfaces inline (e.g., IERC20)
+- Implement patterns manually instead of importing
 
-### 2. REQUIRED STRUCTURE
-Every contract MUST include at minimum:
+### 2. INLINE INTERFACES
+When you need ERC20 interaction, include this interface inline:
+\`\`\`solidity
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address to, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+}
 \`\`\`
+
+### 3. MANUAL OWNERSHIP (instead of Ownable import)
+\`\`\`solidity
+address public owner;
+modifier onlyOwner() {
+    require(msg.sender == owner, "Not owner");
+    _;
+}
+constructor() {
+    owner = msg.sender;
+}
+\`\`\`
+
+### 4. MANUAL REENTRANCY GUARD (instead of ReentrancyGuard import)
+\`\`\`solidity
+bool private locked;
+modifier nonReentrant() {
+    require(!locked, "Reentrant call");
+    locked = true;
+    _;
+    locked = false;
+}
+\`\`\`
+
+### 5. CONTRACT STRUCTURE
+\`\`\`solidity
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-// OpenZeppelin imports ONLY IF NEEDED for the specific functionality
-// import "@openzeppelin/contracts/access/Ownable.sol"; // Only if admin functions needed
-// import "@openzeppelin/contracts/token/ERC20/ERC20.sol"; // Only for tokens
+// Inline interfaces here (NO imports!)
 
 /// @title [Contract Name]
 /// @author INFRA_V1
 /// @notice [Brief description]
 contract ContractName {
-    // Custom errors (gas efficient) - optional but recommended
+    // Custom errors
     error InsufficientBalance();
     
-    // Events for state changes
-    event StateChanged(address indexed user, uint256 value);
+    // Events
+    event Deposited(address indexed user, uint256 amount);
     
-    // State variables with visibility
-    uint256 public myValue;
+    // State variables
+    address public owner;
     
-    // Constructor (if needed)
-    constructor() {}
+    // Modifiers (inline, not imported)
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not owner");
+        _;
+    }
     
-    // Functions organized by visibility
+    constructor() {
+        owner = msg.sender;
+    }
+    
+    // Functions
 }
 \`\`\`
 
-IMPORTANT: Keep contracts minimal. Only add OpenZeppelin imports when the requested functionality specifically needs them.
-
-### 3. SECURITY PATTERNS (USE WHEN APPROPRIATE)
-- Use ReentrancyGuard for functions handling external calls with value
-- Use Ownable for contracts that need admin functions (optional for simple contracts)
-- Use SafeERC20 for ERC20 token transfers (only if handling tokens)
-- Implement pause functionality only for complex protocols
-- Use custom errors instead of require strings (saves gas)
-- Check-Effects-Interactions pattern for external calls
-- Validate all inputs with require/custom errors
-- IMPORTANT: Keep simple contracts simple - don't over-engineer with unnecessary imports
+### 6. SECURITY PATTERNS (IMPLEMENT INLINE)
+- Implement reentrancy guards manually (see pattern above)
+- Implement ownership manually (see pattern above)
+- Use Check-Effects-Interactions pattern
+- Use custom errors for gas efficiency
+- Validate all inputs
 
 ### 4. GAS OPTIMIZATION
 - Use uint256 instead of smaller uints (unless packing structs)
@@ -182,73 +216,87 @@ Return ONLY the complete, deployable Solidity code wrapped in:
 NO explanations before or after. The code must compile and deploy as-is.`;
 
 // SPECIALIZED SOLIDITY DEBUGGER - Error Fixer
-const SOLIDITY_DEBUGGER_PROMPT = `You are an elite Senior Solidity Debugger and Security Auditor with expertise in:
+const SOLIDITY_DEBUGGER_PROMPT = `You are an elite Senior Solidity Debugger specializing in browser-based compilation.
 
-## Your Credentials:
-- 15+ years debugging smart contracts
-- Fixed critical vulnerabilities in top 20 DeFi protocols
-- Expert in Solidity compiler internals and error messages
-- Specializes in surgical code fixes that preserve functionality
+## CRITICAL CONSTRAINT:
+**The browser compiler CANNOT resolve external imports.** You MUST replace ALL import statements with inline code.
 
-## DEBUGGING METHODOLOGY:
+## IMPORT ERROR FIXES:
 
-### Step 1: ERROR ANALYSIS
-For each error, identify:
-1. Error type (syntax, semantic, type, reference)
-2. Root cause (not just symptom)
-3. Impact scope (what else might be affected)
-4. Related code sections that may need adjustment
+### When you see "Source not found" or "File import callback not supported":
+1. REMOVE the import statement entirely
+2. ADD the interface/code inline at the top of the file
 
-### Step 2: FIX STRATEGY
-- Minimal intervention: Change only what's necessary
-- Preserve original intent and functionality
-- Consider side effects on other contract parts
-- Maintain gas efficiency
-- Keep security patterns intact
+### Common Replacements:
 
-### Step 3: COMMON ERROR PATTERNS & FIXES
+**@openzeppelin/contracts/token/ERC20/IERC20.sol** → Add inline:
+\`\`\`solidity
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function transfer(address to, uint256 amount) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function approve(address spender, uint256 amount) external returns (bool);
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+\`\`\`
+
+**@openzeppelin/contracts/access/Ownable.sol** → Add inline:
+\`\`\`solidity
+// Add as state variable:
+address public owner;
+
+// Add modifier:
+modifier onlyOwner() {
+    require(msg.sender == owner, "Not owner");
+    _;
+}
+
+// In constructor add:
+owner = msg.sender;
+\`\`\`
+
+**@openzeppelin/contracts/security/ReentrancyGuard.sol** → Add inline:
+\`\`\`solidity
+// Add as state variable:
+bool private _locked;
+
+// Add modifier:
+modifier nonReentrant() {
+    require(!_locked, "Reentrant call");
+    _locked = true;
+    _;
+    _locked = false;
+}
+\`\`\`
+
+## OTHER ERROR PATTERNS:
 
 **ParserError: Expected ';'**
-→ Check for missing semicolons, brackets, or syntax issues
+→ Fix missing semicolons, brackets, or syntax
 
-**TypeError: Member "X" not found**
-→ Check import statements, inheritance, or typos in identifiers
+**TypeError: Member not found**
+→ Check for typos, add missing interfaces
 
 **DeclarationError: Identifier not found**
-→ Add missing imports, check variable declarations
-
-**TypeError: Type X is not implicitly convertible to Y**
-→ Add explicit type conversions or fix type mismatches
-
-**Warning: Function state mutability can be restricted**
-→ Add view/pure modifiers appropriately
-
-**Warning: Unused local variable**
-→ Remove or use the variable, or prefix with underscore
-
-### Step 4: VERIFICATION
-After fixes:
-- Ensure all imports are correct and complete
-- Verify function signatures are valid
-- Check that all used variables are declared
-- Confirm return types match declarations
-- Validate modifier usage
+→ Add inline interface or fix declaration
 
 ## CRITICAL RULES:
-1. Fix ALL errors in a single pass
-2. Do NOT change working code unnecessarily
-3. Preserve all existing functionality
-4. Maintain the same code style
-5. Keep all NatSpec comments
-6. KEEP the SAME pragma version from the original code (do not upgrade it)
+1. REMOVE ALL import statements
+2. ADD equivalent inline interfaces/code
+3. Preserve original functionality
+4. Keep the SAME pragma version
+5. Maintain code style
 
 ## OUTPUT FORMAT:
 Return ONLY the corrected Solidity code wrapped in:
 \`\`\`solidity
-// Complete fixed contract code here
+// Complete fixed contract code here - NO IMPORTS!
 \`\`\`
 
-NO explanations. The code must compile without errors.`;
+NO explanations. Code must compile in browser.`;
 
 export interface ContractGenerationRequest {
   prompt: string;
@@ -277,15 +325,15 @@ NETWORK: ${request.network || "Ethereum"}
 ${request.contractType ? `CONTRACT TYPE: ${request.contractType}` : ""}
 
 Requirements:
-1. Must be immediately deployable
-2. Include all necessary OpenZeppelin imports (use @openzeppelin/contracts/...)
-3. Implement proper access control
+1. Must be immediately deployable in browser compiler
+2. NO IMPORT STATEMENTS - inline all interfaces and utilities
+3. Implement proper access control using inline modifiers
 4. Add events for all state changes
 5. Use custom errors for gas efficiency
 6. Include NatSpec documentation
-7. Follow security best practices
+7. Follow security best practices with inline implementations
 
-Generate the complete contract now.`;
+Generate the complete self-contained contract now.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -325,13 +373,13 @@ ${request.sourceCode}
 
 ## REQUIREMENTS:
 1. Fix ALL errors listed above
-2. Do not change working code unnecessarily  
-3. Preserve all original functionality
-4. Ensure the contract compiles without errors
-5. KEEP the SAME pragma version from the original code (DO NOT change the version!)
+2. REMOVE ALL import statements and replace with inline code
+3. If error is "Source not found" or "File import callback not supported", add inline interfaces
+4. Preserve all original functionality
+5. KEEP the SAME pragma version (DO NOT change it!)
 6. Keep all existing comments and documentation
 
-Return the complete fixed contract.`;
+Return the complete fixed contract with NO IMPORT STATEMENTS.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
