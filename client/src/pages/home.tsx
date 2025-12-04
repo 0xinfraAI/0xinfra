@@ -112,9 +112,11 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col md:flex-row gap-4"
           >
-            <button className="bg-white text-black font-sans font-bold text-xl px-8 py-4 hover:bg-primary transition-colors border border-white hover:border-primary uppercase">
-              Start Building
-            </button>
+            <a href="/connect">
+              <button className="bg-white text-black font-sans font-bold text-xl px-8 py-4 hover:bg-primary transition-colors border border-white hover:border-primary uppercase">
+                Start Building
+              </button>
+            </a>
             <a href="/docs">
               <button className="bg-transparent text-white font-sans font-bold text-xl px-8 py-4 border border-white hover:bg-white hover:text-black transition-colors uppercase flex items-center gap-3 w-full md:w-auto justify-center">
                 <Terminal className="w-5 h-5" />
