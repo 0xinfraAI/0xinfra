@@ -3,6 +3,7 @@ import { Terminal, Shield, Zap, Wifi, Activity, CheckCircle2, Lock, Globe, Arrow
 import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { CopilotProvider } from "@/components/copilot";
 
 function Navigation() {
   return (
@@ -313,8 +314,14 @@ block = w3.eth.block_number
 print(f"Latest block: {block}")`,
   });
 
+  const copilotContext = {
+    selectedNetwork: mode === "quick" ? selectedNetwork : advancedNetwork || undefined,
+    apiKey: existingKey || connectionData?.apiKey,
+    mode,
+  };
+
   return (
-    <>
+    <CopilotProvider context={copilotContext}>
       <Navigation />
       <div className="min-h-screen bg-background text-foreground pt-20 pb-12">
         <div className="max-w-7xl mx-auto px-6">
@@ -968,6 +975,6 @@ print(f"Latest block: {block}")`,
         </AnimatePresence>
         </div>
       </div>
-    </>
+    </CopilotProvider>
   );
 }

@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { insertConnectionSchema } from "@shared/schema";
 import { validateApiKey, rpcProxyHandler } from "./rpc-proxy";
 import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
+import { generateCopilotResponse, getQuickSuggestions, type CopilotMessage, type CopilotContext } from "./copilot";
 
 interface NetworkStatus {
   slug: string;
@@ -183,6 +184,37 @@ export async function registerRoutes(
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
+  });
+
+  // AI Copilot endpoints
+  app.post("/api/copilot/chat", async (req, res) => {
+    try {
+      const { messages, context } = req.body as {
+        messages: CopilotMessage[];
+        context?: CopilotContext;
+      };
+
+      if (!messages || !Array.isArray(messages) || messages.length === 0) {
+        return res.status(400).json({ error: "Messages array is required" });
+      }
+
+      const response = await generateCopilotResponse(messages, context);
+      res.json({ response });
+    } catch (error: any) {
+      console.error("Copilot chat error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/copilot/suggestions", (req, res) => {
+    const { network, apiKey, mode } = req.query;
+    const context: CopilotContext = {
+      selectedNetwork: network as string | undefined,
+      apiKey: apiKey as string | undefined,
+      mode: mode as "quick" | "advanced" | undefined,
+    };
+    const suggestions = getQuickSuggestions(context);
+    res.json({ suggestions });
   });
 
   return httpServer;
