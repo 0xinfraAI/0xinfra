@@ -2,8 +2,9 @@ export interface NetworkConfig {
   name: string;
   slug: string;
   alchemyPath: string;
-  chainId: number;
+  chainId: number | null;
   type: "mainnet" | "testnet";
+  ecosystem: "evm" | "solana";
 }
 
 export const NETWORKS: Record<string, NetworkConfig> = {
@@ -13,6 +14,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "eth-mainnet",
     chainId: 1,
     type: "mainnet",
+    ecosystem: "evm",
   },
   "ethereum-sepolia": {
     name: "Ethereum Sepolia",
@@ -20,6 +22,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "eth-sepolia",
     chainId: 11155111,
     type: "testnet",
+    ecosystem: "evm",
   },
   "ethereum-goerli": {
     name: "Ethereum Goerli",
@@ -27,6 +30,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "eth-goerli",
     chainId: 5,
     type: "testnet",
+    ecosystem: "evm",
   },
   "polygon": {
     name: "Polygon Mainnet",
@@ -34,6 +38,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "polygon-mainnet",
     chainId: 137,
     type: "mainnet",
+    ecosystem: "evm",
   },
   "polygon-mumbai": {
     name: "Polygon Mumbai",
@@ -41,6 +46,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "polygon-mumbai",
     chainId: 80001,
     type: "testnet",
+    ecosystem: "evm",
   },
   "arbitrum": {
     name: "Arbitrum One",
@@ -48,6 +54,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "arb-mainnet",
     chainId: 42161,
     type: "mainnet",
+    ecosystem: "evm",
   },
   "arbitrum-sepolia": {
     name: "Arbitrum Sepolia",
@@ -55,6 +62,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "arb-sepolia",
     chainId: 421614,
     type: "testnet",
+    ecosystem: "evm",
   },
   "optimism": {
     name: "Optimism Mainnet",
@@ -62,6 +70,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "opt-mainnet",
     chainId: 10,
     type: "mainnet",
+    ecosystem: "evm",
   },
   "optimism-sepolia": {
     name: "Optimism Sepolia",
@@ -69,6 +78,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "opt-sepolia",
     chainId: 11155420,
     type: "testnet",
+    ecosystem: "evm",
   },
   "base": {
     name: "Base Mainnet",
@@ -76,6 +86,7 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "base-mainnet",
     chainId: 8453,
     type: "mainnet",
+    ecosystem: "evm",
   },
   "base-sepolia": {
     name: "Base Sepolia",
@@ -83,6 +94,39 @@ export const NETWORKS: Record<string, NetworkConfig> = {
     alchemyPath: "base-sepolia",
     chainId: 84532,
     type: "testnet",
+    ecosystem: "evm",
+  },
+  "bsc": {
+    name: "BNB Smart Chain",
+    slug: "bsc",
+    alchemyPath: "bnb-mainnet",
+    chainId: 56,
+    type: "mainnet",
+    ecosystem: "evm",
+  },
+  "bsc-testnet": {
+    name: "BNB Smart Chain Testnet",
+    slug: "bsc-testnet",
+    alchemyPath: "bnb-testnet",
+    chainId: 97,
+    type: "testnet",
+    ecosystem: "evm",
+  },
+  "solana": {
+    name: "Solana Mainnet",
+    slug: "solana",
+    alchemyPath: "solana-mainnet",
+    chainId: null,
+    type: "mainnet",
+    ecosystem: "solana",
+  },
+  "solana-devnet": {
+    name: "Solana Devnet",
+    slug: "solana-devnet",
+    alchemyPath: "solana-devnet",
+    chainId: null,
+    type: "testnet",
+    ecosystem: "solana",
   },
 };
 

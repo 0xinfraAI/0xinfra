@@ -9,14 +9,15 @@ import { generateCopilotResponse, getQuickSuggestions, type CopilotMessage, type
 interface NetworkStatus {
   slug: string;
   name: string;
-  chainId: number;
+  chainId: number | null;
   status: "online" | "offline" | "degraded";
   latency: number | null;
   blockNumber: string | null;
   lastChecked: string;
+  ecosystem: "evm" | "solana";
 }
 
-async function checkNetworkStatus(network: { slug: string; name: string; chainId: number; alchemyPath: string }): Promise<NetworkStatus> {
+async function checkNetworkStatus(network: { slug: string; name: string; chainId: number | null; alchemyPath: string; ecosystem: "evm" | "solana" }): Promise<NetworkStatus> {
   const alchemyApiKey = process.env.ALCHEMY_API_KEY;
   if (!alchemyApiKey) {
     return {
@@ -27,6 +28,7 @@ async function checkNetworkStatus(network: { slug: string; name: string; chainId
       latency: null,
       blockNumber: null,
       lastChecked: new Date().toISOString(),
+      ecosystem: network.ecosystem,
     };
   }
 
@@ -34,13 +36,14 @@ async function checkNetworkStatus(network: { slug: string; name: string; chainId
   const startTime = Date.now();
 
   try {
+    const isSolana = network.ecosystem === "solana";
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         jsonrpc: "2.0",
-        method: "eth_blockNumber",
-        params: [],
+        method: isSolana ? "getSlot" : "eth_blockNumber",
+        params: isSolana ? [] : [],
         id: 1,
       }),
     });
@@ -48,15 +51,16 @@ async function checkNetworkStatus(network: { slug: string; name: string; chainId
     const latency = Date.now() - startTime;
     const data = await response.json();
 
-    if (data.result) {
+    if (data.result !== undefined) {
       return {
         slug: network.slug,
         name: network.name,
         chainId: network.chainId,
         status: latency > 500 ? "degraded" : "online",
         latency,
-        blockNumber: data.result,
+        blockNumber: isSolana ? String(data.result) : data.result,
         lastChecked: new Date().toISOString(),
+        ecosystem: network.ecosystem,
       };
     } else {
       return {
@@ -67,6 +71,7 @@ async function checkNetworkStatus(network: { slug: string; name: string; chainId
         latency: null,
         blockNumber: null,
         lastChecked: new Date().toISOString(),
+        ecosystem: network.ecosystem,
       };
     }
   } catch (error) {
@@ -78,6 +83,7 @@ async function checkNetworkStatus(network: { slug: string; name: string; chainId
       latency: null,
       blockNumber: null,
       lastChecked: new Date().toISOString(),
+      ecosystem: network.ecosystem,
     };
   }
 }
@@ -93,6 +99,7 @@ export async function registerRoutes(
       slug: n.slug,
       chainId: n.chainId,
       type: n.type,
+      ecosystem: n.ecosystem,
     }));
     res.json(networks);
   });
@@ -107,6 +114,7 @@ export async function registerRoutes(
           name: network.name,
           chainId: network.chainId,
           alchemyPath: network.alchemyPath,
+          ecosystem: network.ecosystem,
         })
       );
       
@@ -130,6 +138,7 @@ export async function registerRoutes(
         name: network.name,
         chainId: network.chainId,
         alchemyPath: network.alchemyPath,
+        ecosystem: network.ecosystem,
       });
       
       res.json(status);

@@ -21,12 +21,16 @@ import {
 } from "lucide-react";
 
 const NETWORKS = [
-  { id: "eth-mainnet", name: "Ethereum", icon: "⟠" },
-  { id: "polygon-mainnet", name: "Polygon", icon: "⬡" },
-  { id: "arb-mainnet", name: "Arbitrum", icon: "◈" },
-  { id: "opt-mainnet", name: "Optimism", icon: "◎" },
-  { id: "base-mainnet", name: "Base", icon: "◉" },
-  { id: "eth-sepolia", name: "Sepolia", icon: "⟠" },
+  { id: "eth-mainnet", name: "Ethereum", icon: "⟠", category: "mainnet" },
+  { id: "polygon-mainnet", name: "Polygon", icon: "⬡", category: "mainnet" },
+  { id: "arb-mainnet", name: "Arbitrum", icon: "◈", category: "mainnet" },
+  { id: "opt-mainnet", name: "Optimism", icon: "◎", category: "mainnet" },
+  { id: "base-mainnet", name: "Base", icon: "◉", category: "mainnet" },
+  { id: "bsc-mainnet", name: "BSC", icon: "◆", category: "mainnet" },
+  { id: "solana-mainnet", name: "Solana", icon: "◐", category: "mainnet" },
+  { id: "eth-sepolia", name: "Sepolia", icon: "⟠", category: "testnet" },
+  { id: "bsc-testnet", name: "BSC Testnet", icon: "◆", category: "testnet" },
+  { id: "solana-devnet", name: "Solana Devnet", icon: "◐", category: "testnet" },
 ];
 
 const TOPIC_CATEGORIES = [

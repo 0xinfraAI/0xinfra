@@ -6,11 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 interface NetworkStatus {
   slug: string;
   name: string;
-  chainId: number;
+  chainId: number | null;
   status: "online" | "offline" | "degraded";
   latency: number | null;
   blockNumber: string | null;
   lastChecked: string;
+  ecosystem: "evm" | "solana";
 }
 
 const NETWORK_ICONS: Record<string, { icon: string; color: string }> = {
@@ -25,6 +26,10 @@ const NETWORK_ICONS: Record<string, { icon: string; color: string }> = {
   "optimism-sepolia": { icon: "OP", color: "#FF0420" },
   "base": { icon: "BASE", color: "#0052FF" },
   "base-sepolia": { icon: "BASE", color: "#0052FF" },
+  "bsc": { icon: "BNB", color: "#F0B90B" },
+  "bsc-testnet": { icon: "BNB", color: "#F0B90B" },
+  "solana": { icon: "SOL", color: "#9945FF" },
+  "solana-devnet": { icon: "SOL", color: "#9945FF" },
 };
 
 function Navigation() {
@@ -95,17 +100,21 @@ function StatusBadge({ status }: { status: "online" | "offline" | "degraded" }) 
   );
 }
 
-function BlockCounter({ blockNumber }: { blockNumber: string | null }) {
+function BlockCounter({ blockNumber, ecosystem, label }: { blockNumber: string | null; ecosystem: "evm" | "solana"; label?: string }) {
   const [displayBlock, setDisplayBlock] = useState<number>(0);
   
   useEffect(() => {
     if (blockNumber) {
-      const target = parseInt(blockNumber, 16);
+      const target = ecosystem === "solana" 
+        ? parseInt(blockNumber, 10)
+        : parseInt(blockNumber, 16);
       setDisplayBlock(target);
     }
-  }, [blockNumber]);
+  }, [blockNumber, ecosystem]);
 
   if (!blockNumber) return <span className="text-muted-foreground">--</span>;
+
+  const prefix = label || (ecosystem === "solana" ? "Slot" : "#");
 
   return (
     <motion.span 
@@ -114,7 +123,7 @@ function BlockCounter({ blockNumber }: { blockNumber: string | null }) {
       animate={{ opacity: 1, y: 0 }}
       className="text-primary font-bold tabular-nums"
     >
-      #{displayBlock.toLocaleString()}
+      {prefix === "#" ? "#" : `${prefix} `}{displayBlock.toLocaleString()}
     </motion.span>
   );
 }
@@ -321,7 +330,9 @@ export default function Nodes() {
                           </div>
                           <div>
                             <div className="font-bold text-lg">{network.name}</div>
-                            <div className="font-mono text-xs text-muted-foreground">Chain ID: {network.chainId}</div>
+                            <div className="font-mono text-xs text-muted-foreground">
+                              {network.chainId ? `Chain ID: ${network.chainId}` : network.ecosystem === "solana" ? "Solana Network" : "N/A"}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -343,9 +354,9 @@ export default function Nodes() {
                         <div className="flex justify-between items-center border-b border-white/5 pb-2">
                           <span className="text-muted-foreground flex items-center gap-2">
                             <Box className="w-3 h-3" />
-                            Block Height
+                            {network.ecosystem === "solana" ? "Slot" : "Block Height"}
                           </span>
-                          <BlockCounter blockNumber={network.blockNumber} />
+                          <BlockCounter blockNumber={network.blockNumber} ecosystem={network.ecosystem} />
                         </div>
                         <div className="flex justify-between items-center border-b border-white/5 pb-2">
                           <span className="text-muted-foreground flex items-center gap-2">

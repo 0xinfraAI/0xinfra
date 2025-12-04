@@ -10,9 +10,10 @@ const openai = new OpenAI({
 const SYSTEM_PROMPT = `You are INFRA_V1 Copilot, an expert AI assistant for blockchain developers using the INFRA_V1 RPC infrastructure platform.
 
 ## Your Expertise:
-- Blockchain RPC connections (Ethereum, Polygon, Arbitrum, Optimism, Base and their testnets)
-- Web3 development with ethers.js, web3.js, viem, and other libraries
-- Smart contract interactions and debugging
+- Blockchain RPC connections (Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, Solana and their testnets)
+- EVM development with ethers.js, web3.js, viem, and other libraries
+- Solana development with @solana/web3.js library
+- Smart contract interactions (EVM) and program interactions (Solana)
 - Gas optimization and transaction management
 - WebSocket subscriptions for real-time blockchain data
 
@@ -20,6 +21,8 @@ const SYSTEM_PROMPT = `You are INFRA_V1 Copilot, an expert AI assistant for bloc
 - HTTP RPC endpoints: /rpc/{network}/{apiKey}
 - WebSocket endpoints: /ws/{network}/{apiKey}
 - Supported networks: ${getAllNetworks().map(n => n.name).join(", ")}
+- EVM networks: Ethereum, Polygon, Arbitrum, Optimism, Base, BSC (and testnets)
+- Non-EVM networks: Solana (mainnet and devnet)
 - Authentication: API keys (prefixed with "infra_")
 - Features: Low latency, high availability, request logging
 
@@ -96,15 +99,38 @@ export async function generateCopilotResponse(
 
 // Quick suggestions based on context
 export function getQuickSuggestions(context?: CopilotContext): string[] {
-  const suggestions = [
-    "How do I connect to Ethereum using ethers.js?",
-    "Show me how to subscribe to new blocks via WebSocket",
-    "How do I estimate gas for a transaction?",
-    "What's the best way to handle RPC errors?",
-  ];
+  const network = context?.selectedNetwork?.toLowerCase() || "";
+  const isSolana = network.includes("solana");
+  const isBsc = network.includes("bsc") || network.includes("bnb");
+  
+  let suggestions: string[] = [];
+  
+  if (isSolana) {
+    suggestions = [
+      "How do I connect to Solana using @solana/web3.js?",
+      "Show me how to get SOL balance for a wallet",
+      "How do I fetch recent transactions on Solana?",
+      "What's the best way to interact with Solana programs?",
+    ];
+  } else if (isBsc) {
+    suggestions = [
+      "How do I connect to BSC using ethers.js?",
+      "Show me how to interact with PancakeSwap",
+      "How do I get BNB token balances?",
+      "What's the best way to handle BSC transactions?",
+    ];
+  } else {
+    suggestions = [
+      "How do I connect to Ethereum using ethers.js?",
+      "Show me how to subscribe to new blocks via WebSocket",
+      "How do I estimate gas for a transaction?",
+      "What's the best way to handle RPC errors?",
+    ];
+  }
 
   if (context?.selectedNetwork) {
-    suggestions.unshift(`How do I get the latest block on ${context.selectedNetwork}?`);
+    const blockLabel = isSolana ? "slot" : "block";
+    suggestions.unshift(`How do I get the latest ${blockLabel} on ${context.selectedNetwork}?`);
   }
 
   if (context?.apiKey) {
