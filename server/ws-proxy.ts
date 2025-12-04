@@ -113,10 +113,19 @@ export function setupWebSocketProxy(wss: WebSocket.Server) {
       return;
     }
 
-    // Connect to Alchemy WebSocket
-    const upstreamWs = new WebSocket(alchemyWsUrl);
+    // Connect to Alchemy WebSocket with proper headers
+    const upstreamWs = new WebSocket(alchemyWsUrl, {
+      headers: {
+        "Origin": req.headers.origin || "https://infra.v1",
+        "User-Agent": "INFRA_V1/1.0",
+      },
+      handshakeTimeout: 10000,
+    });
+
+    let upstreamConnected = false;
 
     upstreamWs.on("open", () => {
+      upstreamConnected = true;
       console.log(`[WS] Connected to upstream for ${network}`);
     });
 

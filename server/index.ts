@@ -16,13 +16,14 @@ setupWebSocketProxy(wss);
 httpServer.on("upgrade", (request, socket, head) => {
   const pathname = request.url || "";
   
-  // Only handle WebSocket connections for /ws/* paths (our RPC subscriptions)
+  // Only handle our RPC WebSocket connections on /ws/* paths
+  // Other paths (like /vite-hmr) are handled by Vite's own upgrade listener
   if (pathname.startsWith("/ws/")) {
     wss.handleUpgrade(request, socket, head, (ws) => {
       wss.emit("connection", ws, request);
     });
   }
-  // Let other WebSocket connections (like Vite HMR) pass through
+  // Don't touch other WebSocket connections - let Vite handle them
 });
 
 declare module "http" {
