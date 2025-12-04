@@ -3,7 +3,83 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertConnectionSchema } from "@shared/schema";
 import { validateApiKey, rpcProxyHandler } from "./rpc-proxy";
-import { getAllNetworks, getNetworkBySlug } from "./networks";
+import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
+
+interface NetworkStatus {
+  slug: string;
+  name: string;
+  chainId: number;
+  status: "online" | "offline" | "degraded";
+  latency: number | null;
+  blockNumber: string | null;
+  lastChecked: string;
+}
+
+async function checkNetworkStatus(network: { slug: string; name: string; chainId: number; alchemyPath: string }): Promise<NetworkStatus> {
+  const alchemyApiKey = process.env.ALCHEMY_API_KEY;
+  if (!alchemyApiKey) {
+    return {
+      slug: network.slug,
+      name: network.name,
+      chainId: network.chainId,
+      status: "offline",
+      latency: null,
+      blockNumber: null,
+      lastChecked: new Date().toISOString(),
+    };
+  }
+
+  const url = `https://${network.alchemyPath}.g.alchemy.com/v2/${alchemyApiKey}`;
+  const startTime = Date.now();
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "eth_blockNumber",
+        params: [],
+        id: 1,
+      }),
+    });
+
+    const latency = Date.now() - startTime;
+    const data = await response.json();
+
+    if (data.result) {
+      return {
+        slug: network.slug,
+        name: network.name,
+        chainId: network.chainId,
+        status: latency > 500 ? "degraded" : "online",
+        latency,
+        blockNumber: data.result,
+        lastChecked: new Date().toISOString(),
+      };
+    } else {
+      return {
+        slug: network.slug,
+        name: network.name,
+        chainId: network.chainId,
+        status: "offline",
+        latency: null,
+        blockNumber: null,
+        lastChecked: new Date().toISOString(),
+      };
+    }
+  } catch (error) {
+    return {
+      slug: network.slug,
+      name: network.name,
+      chainId: network.chainId,
+      status: "offline",
+      latency: null,
+      blockNumber: null,
+      lastChecked: new Date().toISOString(),
+    };
+  }
+}
 
 export async function registerRoutes(
   httpServer: Server,
@@ -18,6 +94,47 @@ export async function registerRoutes(
       type: n.type,
     }));
     res.json(networks);
+  });
+
+  // Get live network status with connectivity checks
+  app.get("/api/network-status", async (req, res) => {
+    try {
+      const networks = getAllNetworks();
+      const statusPromises = networks.map(network => 
+        checkNetworkStatus({
+          slug: network.slug,
+          name: network.name,
+          chainId: network.chainId,
+          alchemyPath: network.alchemyPath,
+        })
+      );
+      
+      const statuses = await Promise.all(statusPromises);
+      res.json(statuses);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get status for a single network
+  app.get("/api/network-status/:slug", async (req, res) => {
+    try {
+      const network = getNetworkBySlug(req.params.slug);
+      if (!network) {
+        return res.status(404).json({ error: "Network not found" });
+      }
+      
+      const status = await checkNetworkStatus({
+        slug: network.slug,
+        name: network.name,
+        chainId: network.chainId,
+        alchemyPath: network.alchemyPath,
+      });
+      
+      res.json(status);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // RPC Proxy endpoint - validates API key and proxies to provider

@@ -889,10 +889,8 @@ print(f"Latest block: {block}")`,
                               </div>
 
                               <div className="flex gap-4 pt-4">
-                                <Link href="/dashboard">
-                                  <a className="flex-1 bg-white text-black font-mono font-bold py-3 text-center hover:bg-primary transition-colors uppercase">
-                                    View Dashboard
-                                  </a>
+                                <Link href="/dashboard" className="flex-1 bg-white text-black font-mono font-bold py-3 text-center hover:bg-primary transition-colors uppercase">
+                                  View Dashboard
                                 </Link>
                                 <button
                                   onClick={() => {
