@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
-import { Activity, Zap, Globe, Shield, Plus, Copy, Trash2, ExternalLink, RefreshCw } from "lucide-react";
+import { Activity, Zap, Globe, Shield, Plus, Copy, Trash2, ExternalLink, RefreshCw, Check, Terminal } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useState } from "react";
 import type { Connection } from "@shared/schema";
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const { data: connections, isLoading, refetch } = useQuery<Connection[]>({
     queryKey: ["connections"],
@@ -30,8 +32,15 @@ export default function Dashboard() {
   const activeConnections = connections?.filter((c) => c.isActive) || [];
   const totalRequests = connections?.reduce((acc, c) => acc + c.requestCount, 0) || 0;
 
-  const copyToClipboard = (text: string) => {
+  const copyToClipboard = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const getRpcUrl = (apiKey: string) => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/rpc/ethereum`;
   };
 
   return (
@@ -163,10 +172,11 @@ export default function Dashboard() {
                             {connection.apiKey.substring(0, 20)}...
                           </span>
                           <button
-                            onClick={() => copyToClipboard(connection.apiKey)}
+                            onClick={() => copyToClipboard(connection.apiKey, `key-${connection.id}`)}
                             className="text-muted-foreground hover:text-white transition-colors"
+                            title="Copy API Key"
                           >
-                            <Copy className="w-4 h-4" />
+                            {copiedId === `key-${connection.id}` ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                           </button>
                         </div>
                       </td>
@@ -190,13 +200,6 @@ export default function Dashboard() {
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => copyToClipboard(`https://rpc.infra.v1/${connection.network.toLowerCase()}/${connection.apiKey}`)}
-                            className="text-muted-foreground hover:text-primary transition-colors"
-                            title="Copy RPC URL"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </button>
-                          <button
                             onClick={() => deleteMutation.mutate(connection.id)}
                             className="text-muted-foreground hover:text-red-500 transition-colors"
                             title="Deactivate"
@@ -212,6 +215,81 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+
+        {/* RPC Usage Guide */}
+        {connections && connections.length > 0 && (
+          <div className="mt-12 border border-primary/50 p-8 bg-primary/5">
+            <div className="flex items-start gap-4 mb-6">
+              <Terminal className="w-6 h-6 text-primary shrink-0 mt-1" />
+              <div>
+                <h2 className="font-bold uppercase mb-2">Quick Start: Using Your RPC Endpoint</h2>
+                <p className="font-mono text-sm text-muted-foreground">
+                  Make JSON-RPC calls to any supported network using your API key
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-black border border-border p-4 mb-4 overflow-x-auto">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-mono text-muted-foreground">CURL EXAMPLE</span>
+                <button
+                  onClick={() => copyToClipboard(`curl -X POST ${window.location.origin}/rpc/ethereum \\
+  -H "Content-Type: application/json" \\
+  -H "X-INFRA-KEY: ${connections[0].apiKey}" \\
+  -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`, "curl")}
+                  className="text-muted-foreground hover:text-white transition-colors"
+                >
+                  {copiedId === "curl" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+              <pre className="text-primary font-mono text-sm whitespace-pre-wrap">
+{`curl -X POST ${window.location.origin}/rpc/ethereum \\
+  -H "Content-Type: application/json" \\
+  -H "X-INFRA-KEY: ${connections[0].apiKey}" \\
+  -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`}
+              </pre>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-black border border-border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-mono text-muted-foreground">ETHERS.JS</span>
+                  <button
+                    onClick={() => copyToClipboard(`const provider = new ethers.JsonRpcProvider(
+  "${window.location.origin}/rpc/ethereum",
+  undefined,
+  { staticNetwork: true, headers: { "X-INFRA-KEY": "${connections[0].apiKey}" } }
+);`, "ethers")}
+                    className="text-muted-foreground hover:text-white transition-colors"
+                  >
+                    {copiedId === "ethers" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+                <pre className="text-primary font-mono text-xs overflow-x-auto">
+{`const provider = new ethers.JsonRpcProvider(
+  "${window.location.origin}/rpc/ethereum",
+  undefined,
+  { staticNetwork: true, headers: { "X-INFRA-KEY": "YOUR_KEY" } }
+);`}
+                </pre>
+              </div>
+
+              <div className="bg-black border border-border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-mono text-muted-foreground">AVAILABLE NETWORKS</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {["ethereum", "polygon", "arbitrum", "optimism", "base"].map(net => (
+                    <span key={net} className="bg-white/10 px-2 py-1 text-xs font-mono">{net}</span>
+                  ))}
+                </div>
+                <p className="text-xs font-mono text-muted-foreground mt-3">
+                  + testnets: ethereum-sepolia, polygon-mumbai, etc.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Usage Chart Placeholder */}
         <div className="mt-12 border border-border p-8 bg-black">
