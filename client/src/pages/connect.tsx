@@ -1,8 +1,41 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Terminal, Shield, Zap, Wifi, Activity, CheckCircle2, Lock, Globe, ArrowRight, Copy, Check, Code2, Braces, Hash, ChevronDown, ExternalLink, Server, Cpu, Clock, Box } from "lucide-react";
+import { Terminal, Shield, Zap, Wifi, Activity, CheckCircle2, Lock, Globe, ArrowRight, Copy, Check, Code2, Braces, Hash, ChevronDown, ExternalLink, Server, Cpu, Clock, Box, Home } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
+
+function Navigation() {
+  return (
+    <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
+      <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <div className="w-3 h-3 bg-primary animate-pulse" />
+        <span className="font-mono font-bold text-lg tracking-widest">INFRA_V1</span>
+      </a>
+      
+      <div className="hidden md:flex items-center gap-8 font-mono text-sm">
+        {[
+          { label: 'NODES', href: '/nodes' },
+          { label: 'PRICING', href: '/pricing' },
+          { label: 'DASHBOARD', href: '/dashboard' },
+          { label: 'DOCS', href: '/docs' },
+        ].map((item) => (
+          <a 
+            key={item.label} 
+            href={item.href} 
+            className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors"
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+
+      <a href="/" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors font-mono text-sm">
+        <Home className="w-4 h-4" />
+        <span className="hidden md:inline">HOME</span>
+      </a>
+    </nav>
+  );
+}
 
 const NETWORKS = [
   { slug: "ethereum", name: "Ethereum", chainId: 1, blockTime: "12s", icon: "ETH", color: "#627EEA" },
@@ -281,8 +314,10 @@ print(f"Latest block: {block}")`,
   });
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-6">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-background text-foreground pt-20 pb-12">
+        <div className="max-w-7xl mx-auto px-6">
         
         <header className="mb-12 relative">
           <div className="absolute -inset-4 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 blur-3xl -z-10" />
@@ -933,7 +968,8 @@ print(f"Latest block: {block}")`,
             </motion.div>
           )}
         </AnimatePresence>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
