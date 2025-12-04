@@ -29,7 +29,44 @@ The frontend is built using React with TypeScript and Vite as the build tool. Th
 - Deploy: Smart contract deployment interface with wallet connection and AI contract generation
 - Copilot: Dedicated AI-powered blockchain development assistant with full-screen chat interface
 - Pricing: Tiered pricing plans
-- Docs: Technical documentation
+- Docs: Comprehensive Alchemy-style documentation with interactive features
+
+## Documentation System
+
+The Docs page is a comprehensive, Alchemy-style documentation system with advanced features.
+
+**Structure:**
+- Sidebar navigation with collapsible categories and search
+- 13 documentation sections across 6 categories: Getting Started, Core Concepts, API Reference, SDKs, Tutorials, Advanced
+- Sticky header with breadcrumb navigation
+
+**Interactive Features:**
+- **Mermaid Diagrams**: CDN-loaded mermaid.js with dark theme for visualizing:
+  - Authentication flow (sequence diagram)
+  - System architecture (flowchart)
+  - Request flow with caching (sequence diagram)
+  - Contract deployment flow (flowchart)
+  - AI Copilot capabilities (mindmap)
+  - Webhook flow (sequence diagram)
+- **Code Tabs**: Switch between cURL, JavaScript, and Python examples
+- **Expandable API Cards**: Method documentation with parameters, examples, and response previews
+- **Copy Button**: With secure clipboard API and execCommand fallback for HTTP contexts
+- **Callout Components**: Info, warning, and success callouts for important notes
+
+**Sections:**
+- Quick Start: 3-step getting started guide with first API call example
+- Authentication: API key types, usage, and security best practices
+- Architecture: Infrastructure components and request flow diagrams
+- Supported Networks: EVM and non-EVM network tables with chain IDs
+- Ethereum Methods: eth_blockNumber, eth_getBalance, eth_getTransactionByHash, eth_sendRawTransaction
+- Enhanced APIs: Token balances, NFT APIs (Pro features)
+- Solana API: getBalance, getRecentBlockhash
+- JavaScript SDK: Installation and ethers.js integration
+- Python SDK: Installation and web3.py integration
+- Deploy Contracts: Tutorial with deployment flow diagram
+- AI Copilot: Feature guide with capabilities mindmap
+- Webhooks: Event types and flow diagram
+- Rate Limits: Plan comparison table and header documentation
 
 ## AI Copilot Feature
 
