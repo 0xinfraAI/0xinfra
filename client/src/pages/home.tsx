@@ -43,13 +43,18 @@ export default function Home() {
         </div>
         
         <div className="hidden md:flex items-center gap-8 font-mono text-sm">
-          {['NODES', 'RPC', 'STAKING', 'DOCS'].map((item) => (
+          {[
+            { label: 'NODES', href: '/nodes' },
+            { label: 'PRICING', href: '/pricing' },
+            { label: 'DASHBOARD', href: '/dashboard' },
+            { label: 'DOCS', href: '/docs' },
+          ].map((item) => (
             <a 
-              key={item} 
-              href={item === 'NODES' ? '/nodes' : item === 'DOCS' ? '/docs' : '#'} 
+              key={item.label} 
+              href={item.href} 
               className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors"
             >
-              {item}
+              {item.label}
             </a>
           ))}
         </div>
@@ -121,6 +126,69 @@ export default function Home() {
         
         <div className="relative z-20 mt-auto">
           <Marquee text=" SYSTEM STATUS: ONLINE // LATENCY: 12MS // NODES: 4,201 // BLOCK HEIGHT: 19,203,122 // " />
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-24 px-4 md:px-12 border-b border-border bg-neutral-950">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="font-mono text-primary text-sm mb-4 tracking-widest">[ HOW_IT_WORKS ]</p>
+            <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter">
+              Three Steps to <span className="text-primary">Launch</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                title: "Connect",
+                desc: "Sign up and generate your API key in seconds. No credit card required for the free tier.",
+                icon: "→",
+              },
+              {
+                step: "02",
+                title: "Integrate",
+                desc: "Drop our RPC endpoint into your dApp. Compatible with ethers.js, web3.js, and all major libraries.",
+                icon: "⟨/⟩",
+              },
+              {
+                step: "03",
+                title: "Scale",
+                desc: "We handle the infrastructure. You focus on building. Upgrade seamlessly as you grow.",
+                icon: "↗",
+              },
+            ].map((item, i) => (
+              <motion.div
+                key={item.step}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                viewport={{ once: true }}
+                className="relative border border-border p-8 bg-black group hover:border-primary transition-colors"
+              >
+                <div className="absolute -top-4 left-8 bg-primary text-black px-3 py-1 font-mono font-bold text-sm">
+                  STEP {item.step}
+                </div>
+                <div className="text-6xl mb-6 font-mono text-primary/30 group-hover:text-primary transition-colors">
+                  {item.icon}
+                </div>
+                <h3 className="text-2xl font-bold uppercase mb-4">{item.title}</h3>
+                <p className="font-mono text-sm text-muted-foreground leading-relaxed">
+                  {item.desc}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-16 text-center">
+            <a href="/connect">
+              <button className="bg-primary text-black font-mono font-bold text-lg px-12 py-4 hover:bg-white transition-colors uppercase">
+                Get Started Now
+              </button>
+            </a>
+          </div>
         </div>
       </section>
 

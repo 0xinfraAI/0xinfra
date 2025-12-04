@@ -41,12 +41,10 @@ export default function Docs() {
       {/* Sidebar Navigation */}
       <aside className="w-full md:w-64 border-r border-border bg-background/95 backdrop-blur fixed md:sticky top-0 z-40 h-auto md:h-screen overflow-y-auto">
         <div className="p-6 border-b border-border flex items-center gap-2">
-          <Link href="/">
-            <a className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <div className="w-3 h-3 bg-primary" />
-              <span className="font-mono font-bold tracking-widest">INFRA_V1</span>
-            </a>
-          </Link>
+          <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <div className="w-3 h-3 bg-primary" />
+            <span className="font-mono font-bold tracking-widest">INFRA_V1</span>
+          </a>
         </div>
         
         <div className="p-6">

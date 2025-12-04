@@ -8,6 +8,8 @@ import Home from "@/pages/home";
 import Docs from "@/pages/docs";
 import Nodes from "@/pages/nodes";
 import Connect from "@/pages/connect";
+import Pricing from "@/pages/pricing";
+import Dashboard from "@/pages/dashboard";
 
 function Router() {
   return (
@@ -16,6 +18,8 @@ function Router() {
       <Route path="/docs" component={Docs} />
       <Route path="/nodes" component={Nodes} />
       <Route path="/connect" component={Connect} />
+      <Route path="/pricing" component={Pricing} />
+      <Route path="/dashboard" component={Dashboard} />
       <Route component={NotFound} />
     </Switch>
   );
