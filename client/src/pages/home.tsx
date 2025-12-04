@@ -45,6 +45,7 @@ export default function Home() {
         <div className="hidden md:flex items-center gap-8 font-mono text-sm">
           {[
             { label: 'NODES', href: '/nodes' },
+            { label: 'AI COPILOT', href: '/copilot' },
             { label: 'PRICING', href: '/pricing' },
             { label: 'DASHBOARD', href: '/dashboard' },
             { label: 'DOCS', href: '/docs' },
@@ -383,6 +384,7 @@ export default function Home() {
             <span className="text-primary font-bold">[ PRODUCT ]</span>
             <a href="/nodes" className="hover:text-white text-neutral-400">Nodes</a>
             <a href="/connect" className="hover:text-white text-neutral-400">Start Building</a>
+            <a href="/copilot" className="hover:text-white text-neutral-400">AI Copilot</a>
             <a href="/pricing" className="hover:text-white text-neutral-400">Pricing</a>
             <a href="/docs" className="hover:text-white text-neutral-400">API Docs</a>
           </div>
