@@ -558,26 +558,39 @@ Fix all the errors while preserving the original contract's functionality.`,
                       {error.message}
                     </div>
                   ))}
-                  <button
-                    onClick={askAiToFix}
-                    disabled={isAiFixing}
-                    className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50 font-mono text-sm"
-                    data-testid="ask-ai-fix"
-                  >
-                    {isAiFixing ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        AI is fixing...
-                      </>
-                    ) : (
-                      <>
-                        <Bot className="w-4 h-4" />
-                        Ask AI to Fix
-                      </>
-                    )}
-                  </button>
                 </div>
               )}
+
+              {/* Ask AI to Fix - Always visible, enabled when errors exist */}
+              <div className="mt-4">
+                <button
+                  onClick={askAiToFix}
+                  disabled={isAiFixing || !compileResult?.errors || compileResult.errors.length === 0}
+                  className={`w-full flex items-center justify-center gap-2 px-4 py-3 font-mono text-sm transition-colors ${
+                    compileResult?.errors && compileResult.errors.length > 0
+                      ? "bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30"
+                      : "bg-neutral-800 border border-border text-muted-foreground cursor-not-allowed"
+                  } disabled:opacity-50`}
+                  data-testid="ask-ai-fix"
+                >
+                  {isAiFixing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      AI is fixing...
+                    </>
+                  ) : (
+                    <>
+                      <Bot className="w-4 h-4" />
+                      Ask AI to Fix Errors
+                    </>
+                  )}
+                </button>
+                {(!compileResult?.errors || compileResult.errors.length === 0) && (
+                  <p className="text-xs text-muted-foreground mt-2 text-center">
+                    Compile first to check for errors
+                  </p>
+                )}
+              </div>
 
               {compileResult?.warnings && compileResult.warnings.length > 0 && (
                 <div className="mt-4 space-y-2">
