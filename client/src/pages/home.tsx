@@ -381,23 +381,23 @@ export default function Home() {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-12 md:gap-24 font-mono text-sm">
           <div className="flex flex-col gap-4">
             <span className="text-primary font-bold">[ PRODUCT ]</span>
-            <a href="#" className="hover:text-white text-neutral-400">Nodes</a>
-            <a href="#" className="hover:text-white text-neutral-400">Staking</a>
-            <a href="#" className="hover:text-white text-neutral-400">API</a>
-            <a href="#" className="hover:text-white text-neutral-400">CLI</a>
+            <a href="/nodes" className="hover:text-white text-neutral-400">Nodes</a>
+            <a href="/connect" className="hover:text-white text-neutral-400">Start Building</a>
+            <a href="/pricing" className="hover:text-white text-neutral-400">Pricing</a>
+            <a href="/docs" className="hover:text-white text-neutral-400">API Docs</a>
           </div>
           <div className="flex flex-col gap-4">
-            <span className="text-primary font-bold">[ COMPANY ]</span>
-            <a href="#" className="hover:text-white text-neutral-400">About</a>
-            <a href="#" className="hover:text-white text-neutral-400">Careers</a>
-            <a href="#" className="hover:text-white text-neutral-400">Blog</a>
-            <a href="#" className="hover:text-white text-neutral-400">Press</a>
+            <span className="text-primary font-bold">[ RESOURCES ]</span>
+            <a href="/dashboard" className="hover:text-white text-neutral-400">Dashboard</a>
+            <a href="/docs" className="hover:text-white text-neutral-400">Documentation</a>
+            <a href="/nodes" className="hover:text-white text-neutral-400">Network Status</a>
+            <a href="/connect" className="hover:text-white text-neutral-400">Quick Start</a>
           </div>
           <div className="flex flex-col gap-4">
-            <span className="text-primary font-bold">[ SOCIAL ]</span>
-            <a href="#" className="hover:text-white text-neutral-400">Twitter</a>
-            <a href="#" className="hover:text-white text-neutral-400">Discord</a>
-            <a href="#" className="hover:text-white text-neutral-400">GitHub</a>
+            <span className="text-primary font-bold">[ CONNECT ]</span>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">Twitter</a>
+            <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">Discord</a>
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">GitHub</a>
           </div>
         </div>
       </footer>
