@@ -2,11 +2,28 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertConnectionSchema } from "@shared/schema";
+import { validateApiKey, rpcProxyHandler } from "./rpc-proxy";
+import { getAllNetworks, getNetworkBySlug } from "./networks";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Get available networks
+  app.get("/api/networks", (req, res) => {
+    const networks = getAllNetworks().map(n => ({
+      name: n.name,
+      slug: n.slug,
+      chainId: n.chainId,
+      type: n.type,
+    }));
+    res.json(networks);
+  });
+
+  // RPC Proxy endpoint - validates API key and proxies to provider
+  app.post("/rpc/:network", validateApiKey, rpcProxyHandler);
+
+  // Connection management
   app.post("/api/connections", async (req, res) => {
     try {
       const validated = insertConnectionSchema.parse(req.body);
