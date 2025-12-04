@@ -24,10 +24,28 @@ The frontend is built using React with TypeScript and Vite as the build tool. Th
 **Pages:**
 - Home: Landing page with hero section and feature showcase
 - Dashboard: Connection management and monitoring
-- Connect: Interactive connection creation wizard
-- Nodes: Node marketplace/explorer
+- Connect: Interactive connection creation wizard with Quick Start and Advanced modes
+- Nodes: Node marketplace/explorer with live network status
+- Copilot: Dedicated AI-powered blockchain development assistant with full-screen chat interface
 - Pricing: Tiered pricing plans
 - Docs: Technical documentation
+
+## AI Copilot Feature
+
+The AI Copilot is a context-aware blockchain development assistant powered by OpenAI via Replit AI Integrations.
+
+**Features:**
+- Full-screen chat interface with brutalist design
+- Network context selector (Ethereum, Polygon, Arbitrum, Optimism, Base, Sepolia)
+- Six topic categories for quick prompts: RPC & Connections, Smart Contracts, Web3 Development, DeFi & Tokens, Security, Data & Analytics
+- Code block rendering with syntax highlighting and copy functionality
+- Proper error handling with dismissable error alerts
+- Context-aware suggestions based on selected network
+
+**Backend Integration:**
+- `/api/copilot/chat`: Chat endpoint with message history and context
+- `/api/copilot/suggestions`: Dynamic suggestions based on network context
+- Uses OpenAI GPT model with INFRA_V1-specific system prompt
 
 ## Backend Architecture
 
