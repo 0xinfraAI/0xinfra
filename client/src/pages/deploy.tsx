@@ -64,6 +64,7 @@ interface DeploymentResult {
   network: string;
   verificationUrl: string | null;
   explorerUrl: string | null;
+  transactionUrl: string | null;
 }
 
 const SAMPLE_CONTRACT = `// SPDX-License-Identifier: MIT
@@ -144,7 +145,7 @@ export default function DeployPage() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [sourceCode, setSourceCode] = useState(SAMPLE_CONTRACT);
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("eth-sepolia");
+  const [selectedNetwork, setSelectedNetwork] = useState<string>("ethereum-sepolia");
   const [showNetworkDropdown, setShowNetworkDropdown] = useState(false);
   const [compileResult, setCompileResult] = useState<CompileResult | null>(null);
   const [selectedContract, setSelectedContract] = useState<string | null>(null);
@@ -299,7 +300,7 @@ Make it deployable as-is.`,
 
       if (receipt && receipt.contractAddress) {
         const verifyRes = await fetch(
-          `/api/contracts/verification-url?network=${selectedNetwork}&address=${receipt.contractAddress}`
+          `/api/contracts/verification-url?network=${selectedNetwork}&address=${receipt.contractAddress}&txHash=${txHash}`
         );
         const verifyData = await verifyRes.json();
 
@@ -309,6 +310,7 @@ Make it deployable as-is.`,
           network: network.name,
           verificationUrl: verifyData.verificationUrl,
           explorerUrl: verifyData.explorerUrl,
+          transactionUrl: verifyData.transactionUrl,
         });
       } else {
         throw new Error("Failed to get contract address from transaction receipt");
@@ -613,7 +615,7 @@ Make it deployable as-is.`,
                     </div>
                   </div>
 
-                  <div className="flex gap-4 mt-4">
+                  <div className="flex flex-wrap gap-4 mt-4">
                     {deploymentResult.explorerUrl && (
                       <a
                         href={deploymentResult.explorerUrl}
@@ -623,7 +625,19 @@ Make it deployable as-is.`,
                         data-testid="view-explorer"
                       >
                         <ExternalLink className="w-4 h-4" />
-                        View on Explorer
+                        View Contract
+                      </a>
+                    )}
+                    {deploymentResult.transactionUrl && (
+                      <a
+                        href={deploymentResult.transactionUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white font-bold hover:bg-blue-400 transition-colors"
+                        data-testid="view-transaction"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Transaction
                       </a>
                     )}
                     {deploymentResult.verificationUrl && (

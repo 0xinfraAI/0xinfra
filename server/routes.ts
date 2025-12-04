@@ -5,7 +5,7 @@ import { insertConnectionSchema } from "@shared/schema";
 import { validateApiKey, rpcProxyHandler } from "./rpc-proxy";
 import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
 import { generateCopilotResponse, getQuickSuggestions, type CopilotMessage, type CopilotContext } from "./copilot";
-import { compileSolidity, getVerificationUrl, getExplorerTxUrl } from "./contract-compiler";
+import { compileSolidity, getVerificationUrl, getExplorerTxUrl, getExplorerAddressUrl } from "./contract-compiler";
 
 interface NetworkStatus {
   slug: string;
@@ -246,18 +246,20 @@ export async function registerRoutes(
 
   // Get verification URL for deployed contract
   app.get("/api/contracts/verification-url", (req, res) => {
-    const { network, address } = req.query;
+    const { network, address, txHash } = req.query;
     
     if (!network || !address) {
       return res.status(400).json({ error: "Network and address are required" });
     }
 
     const verificationUrl = getVerificationUrl(network as string, address as string);
-    const txUrl = getExplorerTxUrl(network as string, address as string);
+    const addressUrl = getExplorerAddressUrl(network as string, address as string);
+    const txUrl = txHash ? getExplorerTxUrl(network as string, txHash as string) : null;
     
     res.json({ 
       verificationUrl,
-      explorerUrl: txUrl,
+      explorerUrl: addressUrl,
+      transactionUrl: txUrl,
     });
   });
 

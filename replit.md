@@ -26,6 +26,7 @@ The frontend is built using React with TypeScript and Vite as the build tool. Th
 - Dashboard: Connection management and monitoring
 - Connect: Interactive connection creation wizard with Quick Start and Advanced modes
 - Nodes: Node marketplace/explorer with live network status
+- Deploy: Smart contract deployment interface with wallet connection and AI contract generation
 - Copilot: Dedicated AI-powered blockchain development assistant with full-screen chat interface
 - Pricing: Tiered pricing plans
 - Docs: Technical documentation
@@ -46,6 +47,37 @@ The AI Copilot is a context-aware blockchain development assistant powered by Op
 - `/api/copilot/chat`: Chat endpoint with message history and context
 - `/api/copilot/suggestions`: Dynamic suggestions based on network context
 - Uses OpenAI GPT model with INFRA_V1-specific system prompt
+
+## Smart Contract Deployment Feature
+
+The Deploy page allows users to write, compile, and deploy smart contracts directly from the browser.
+
+**Features:**
+- MetaMask wallet connection with network switching
+- Solidity code editor with sample contract template
+- AI-powered contract generation from natural language descriptions
+- Real-time compilation with error and warning display
+- One-click deployment to any supported EVM network
+- Automatic block explorer links for contract verification
+
+**Supported Networks for Deployment:**
+- Ethereum (Mainnet, Sepolia, Goerli)
+- Polygon (Mainnet, Mumbai)
+- Arbitrum (Mainnet, Sepolia)
+- Optimism (Mainnet, Sepolia)
+- Base (Mainnet, Sepolia)
+- BSC (Mainnet, Testnet)
+
+**Backend Integration:**
+- `/api/contracts/compile`: Compiles Solidity code using solc and returns bytecode/ABI
+- `/api/contracts/verification-url`: Returns block explorer verification and transaction URLs
+- `/api/contracts/networks`: Returns list of EVM networks available for deployment
+
+**Technical Implementation:**
+- Uses solc (Solidity compiler) for contract compilation
+- MetaMask integration via window.ethereum for wallet connection and transaction signing
+- Network switching via wallet_switchEthereumChain
+- Transaction monitoring via eth_getTransactionReceipt polling
 
 ## Backend Architecture
 

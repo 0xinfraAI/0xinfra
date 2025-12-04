@@ -108,13 +108,18 @@ export function compileSolidity(sourceCode: string, contractFileName: string = "
 
 export function getVerificationUrl(network: string, contractAddress: string): string | null {
   const explorerUrls: { [key: string]: string } = {
-    "eth-mainnet": `https://etherscan.io/address/${contractAddress}#code`,
-    "eth-sepolia": `https://sepolia.etherscan.io/address/${contractAddress}#code`,
-    "polygon-mainnet": `https://polygonscan.com/address/${contractAddress}#code`,
-    "arb-mainnet": `https://arbiscan.io/address/${contractAddress}#code`,
-    "opt-mainnet": `https://optimistic.etherscan.io/address/${contractAddress}#code`,
-    "base-mainnet": `https://basescan.org/address/${contractAddress}#code`,
-    "bsc-mainnet": `https://bscscan.com/address/${contractAddress}#code`,
+    "ethereum": `https://etherscan.io/address/${contractAddress}#code`,
+    "ethereum-sepolia": `https://sepolia.etherscan.io/address/${contractAddress}#code`,
+    "ethereum-goerli": `https://goerli.etherscan.io/address/${contractAddress}#code`,
+    "polygon": `https://polygonscan.com/address/${contractAddress}#code`,
+    "polygon-mumbai": `https://mumbai.polygonscan.com/address/${contractAddress}#code`,
+    "arbitrum": `https://arbiscan.io/address/${contractAddress}#code`,
+    "arbitrum-sepolia": `https://sepolia.arbiscan.io/address/${contractAddress}#code`,
+    "optimism": `https://optimistic.etherscan.io/address/${contractAddress}#code`,
+    "optimism-sepolia": `https://sepolia-optimism.etherscan.io/address/${contractAddress}#code`,
+    "base": `https://basescan.org/address/${contractAddress}#code`,
+    "base-sepolia": `https://sepolia.basescan.org/address/${contractAddress}#code`,
+    "bsc": `https://bscscan.com/address/${contractAddress}#code`,
     "bsc-testnet": `https://testnet.bscscan.com/address/${contractAddress}#code`,
   };
 
@@ -123,14 +128,39 @@ export function getVerificationUrl(network: string, contractAddress: string): st
 
 export function getExplorerTxUrl(network: string, txHash: string): string | null {
   const explorerUrls: { [key: string]: string } = {
-    "eth-mainnet": `https://etherscan.io/tx/${txHash}`,
-    "eth-sepolia": `https://sepolia.etherscan.io/tx/${txHash}`,
-    "polygon-mainnet": `https://polygonscan.com/tx/${txHash}`,
-    "arb-mainnet": `https://arbiscan.io/tx/${txHash}`,
-    "opt-mainnet": `https://optimistic.etherscan.io/tx/${txHash}`,
-    "base-mainnet": `https://basescan.org/tx/${txHash}`,
-    "bsc-mainnet": `https://bscscan.com/tx/${txHash}`,
+    "ethereum": `https://etherscan.io/tx/${txHash}`,
+    "ethereum-sepolia": `https://sepolia.etherscan.io/tx/${txHash}`,
+    "ethereum-goerli": `https://goerli.etherscan.io/tx/${txHash}`,
+    "polygon": `https://polygonscan.com/tx/${txHash}`,
+    "polygon-mumbai": `https://mumbai.polygonscan.com/tx/${txHash}`,
+    "arbitrum": `https://arbiscan.io/tx/${txHash}`,
+    "arbitrum-sepolia": `https://sepolia.arbiscan.io/tx/${txHash}`,
+    "optimism": `https://optimistic.etherscan.io/tx/${txHash}`,
+    "optimism-sepolia": `https://sepolia-optimism.etherscan.io/tx/${txHash}`,
+    "base": `https://basescan.org/tx/${txHash}`,
+    "base-sepolia": `https://sepolia.basescan.org/tx/${txHash}`,
+    "bsc": `https://bscscan.com/tx/${txHash}`,
     "bsc-testnet": `https://testnet.bscscan.com/tx/${txHash}`,
+  };
+
+  return explorerUrls[network] || null;
+}
+
+export function getExplorerAddressUrl(network: string, address: string): string | null {
+  const explorerUrls: { [key: string]: string } = {
+    "ethereum": `https://etherscan.io/address/${address}`,
+    "ethereum-sepolia": `https://sepolia.etherscan.io/address/${address}`,
+    "ethereum-goerli": `https://goerli.etherscan.io/address/${address}`,
+    "polygon": `https://polygonscan.com/address/${address}`,
+    "polygon-mumbai": `https://mumbai.polygonscan.com/address/${address}`,
+    "arbitrum": `https://arbiscan.io/address/${address}`,
+    "arbitrum-sepolia": `https://sepolia.arbiscan.io/address/${address}`,
+    "optimism": `https://optimistic.etherscan.io/address/${address}`,
+    "optimism-sepolia": `https://sepolia-optimism.etherscan.io/address/${address}`,
+    "base": `https://basescan.org/address/${address}`,
+    "base-sepolia": `https://sepolia.basescan.org/address/${address}`,
+    "bsc": `https://bscscan.com/address/${address}`,
+    "bsc-testnet": `https://testnet.bscscan.com/address/${address}`,
   };
 
   return explorerUrls[network] || null;
