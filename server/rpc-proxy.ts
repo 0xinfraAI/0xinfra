@@ -4,33 +4,38 @@ import { getAlchemyUrl, getNetworkBySlug } from "./networks";
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
-function sanitizeError(error: any): { code: number; message: string } {
-  let message = error?.message || error?.error?.message || "Internal server error";
-  
-  message = message
+function sanitizeString(str: string): string {
+  return str
     .replace(/alchemy/gi, "INFRA_V1")
     .replace(/Alchemy/g, "INFRA_V1")
     .replace(/api\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/g\.alchemy\.com/gi, "infra.v1");
-
-  return {
-    code: error?.code || error?.error?.code || -32603,
-    message,
-  };
+    .replace(/g\.alchemy\.com/gi, "infra.v1")
+    .replace(/eth-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
+    .replace(/polygon-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
+    .replace(/arb-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
+    .replace(/opt-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
+    .replace(/base-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
+    .replace(/[a-zA-Z0-9-]+\.g\.alchemy\.com/gi, "rpc.infra.v1");
 }
 
 function sanitizeResponse(data: any): any {
-  if (typeof data === "string") {
-    return data
-      .replace(/alchemy/gi, "INFRA_V1")
-      .replace(/api\.g\.alchemy\.com/gi, "rpc.infra.v1");
+  if (data === null || data === undefined) {
+    return data;
   }
   
-  if (typeof data === "object" && data !== null) {
-    if (Array.isArray(data)) {
-      return data.map(sanitizeResponse);
-    }
-    
+  if (typeof data === "string") {
+    return sanitizeString(data);
+  }
+  
+  if (typeof data === "number" || typeof data === "boolean") {
+    return data;
+  }
+  
+  if (Array.isArray(data)) {
+    return data.map(sanitizeResponse);
+  }
+  
+  if (typeof data === "object") {
     const sanitized: any = {};
     for (const [key, value] of Object.entries(data)) {
       sanitized[key] = sanitizeResponse(value);
@@ -39,6 +44,22 @@ function sanitizeResponse(data: any): any {
   }
   
   return data;
+}
+
+function sanitizeError(error: any): { code: number; message: string; data?: any } {
+  let message = error?.message || error?.error?.message || "Internal server error";
+  message = sanitizeString(message);
+  
+  const result: { code: number; message: string; data?: any } = {
+    code: error?.code || error?.error?.code || -32603,
+    message,
+  };
+  
+  if (error?.data) {
+    result.data = sanitizeResponse(error.data);
+  }
+  
+  return result;
 }
 
 export async function validateApiKey(
