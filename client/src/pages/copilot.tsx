@@ -18,6 +18,7 @@ import {
   Shield,
   Wallet,
   ArrowRight,
+  Rocket,
 } from "lucide-react";
 
 const NETWORKS = [
@@ -353,6 +354,16 @@ export default function CopilotPage() {
                   <p className="text-xs text-muted-foreground font-mono">Blockchain Dev Assistant</p>
                 </div>
               </div>
+
+              {/* Deploy Contract Button */}
+              <a
+                href="/deploy"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-black font-bold hover:bg-green-400 transition-colors mb-4"
+                data-testid="deploy-contract-link"
+              >
+                <Rocket className="w-5 h-5" />
+                Deploy Contract
+              </a>
 
               {/* Network Selector */}
               <div className="relative">

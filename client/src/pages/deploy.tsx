@@ -152,6 +152,7 @@ export default function DeployPage() {
   const [deploymentResult, setDeploymentResult] = useState<DeploymentResult | null>(null);
   const [deployError, setDeployError] = useState<string | null>(null);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [isAiFixing, setIsAiFixing] = useState(false);
 
   const { data: networks } = useQuery<Network[]>({
     queryKey: ["/api/contracts/networks"],
@@ -217,6 +218,51 @@ Make it deployable as-is.`,
       setAiPrompt("");
     },
   });
+
+  const askAiToFix = async () => {
+    if (!compileResult?.errors || compileResult.errors.length === 0) return;
+    
+    setIsAiFixing(true);
+    try {
+      const errorMessages = compileResult.errors.map(e => e.message).join("\n");
+      const res = await fetch("/api/copilot/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: "user",
+              content: `Fix the following Solidity compilation errors in this contract.
+
+ERRORS:
+${errorMessages}
+
+CURRENT CONTRACT:
+\`\`\`solidity
+${sourceCode}
+\`\`\`
+
+IMPORTANT: Return ONLY the corrected Solidity code wrapped in a code block. No explanations before or after.
+Fix all the errors while preserving the original contract's functionality.`,
+            },
+          ],
+          context: { selectedNetwork, mode: "quick" },
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to get AI fix");
+      const data = await res.json() as { response: string };
+      
+      const codeMatch = data.response.match(/```(?:solidity)?\n([\s\S]*?)```/);
+      if (codeMatch && codeMatch[1]) {
+        setSourceCode(codeMatch[1].trim());
+        setCompileResult(null);
+      }
+    } catch (error) {
+      console.error("AI fix failed:", error);
+    } finally {
+      setIsAiFixing(false);
+    }
+  };
 
   const connectWallet = async () => {
     if (!window.ethereum) {
@@ -512,6 +558,24 @@ Make it deployable as-is.`,
                       {error.message}
                     </div>
                   ))}
+                  <button
+                    onClick={askAiToFix}
+                    disabled={isAiFixing}
+                    className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 bg-primary/20 border border-primary/50 text-primary hover:bg-primary/30 transition-colors disabled:opacity-50 font-mono text-sm"
+                    data-testid="ask-ai-fix"
+                  >
+                    {isAiFixing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        AI is fixing...
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="w-4 h-4" />
+                        Ask AI to Fix
+                      </>
+                    )}
+                  </button>
                 </div>
               )}
 
