@@ -158,4 +158,106 @@
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
+
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(204, 255, 0, 0.3), 
+                0 0 40px rgba(204, 255, 0, 0.1),
+                inset 0 0 20px rgba(204, 255, 0, 0.05);
+  }
+
+  .glow-primary-intense {
+    box-shadow: 0 0 30px rgba(204, 255, 0, 0.5), 
+                0 0 60px rgba(204, 255, 0, 0.2),
+                0 0 100px rgba(204, 255, 0, 0.1);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px rgba(204, 255, 0, 0.8),
+                 0 0 20px rgba(204, 255, 0, 0.5),
+                 0 0 40px rgba(204, 255, 0, 0.3);
+  }
+
+  .terminal-glow {
+    box-shadow: 0 0 0 1px rgba(204, 255, 0, 0.3),
+                0 0 30px rgba(204, 255, 0, 0.1),
+                inset 0 0 60px rgba(0, 0, 0, 0.8);
+  }
+
+  .scanline::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      transparent 50%,
+      rgba(0, 0, 0, 0.03) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+
+  .animate-flicker {
+    animation: flicker 0.15s infinite;
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.97; }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px rgba(204, 255, 0, 0.3);
+    }
+    50% { 
+      box-shadow: 0 0 40px rgba(204, 255, 0, 0.6);
+    }
+  }
+
+  .code-highlight {
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba(204, 255, 0, 0.1) 10%, 
+      rgba(204, 255, 0, 0.1) 90%, 
+      transparent 100%
+    );
+  }
+
+  .border-glow {
+    position: relative;
+  }
+
+  .border-glow::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    background: linear-gradient(45deg, 
+      rgba(204, 255, 0, 0.5), 
+      transparent, 
+      rgba(204, 255, 0, 0.5)
+    );
+    z-index: -1;
+    animation: border-glow-anim 3s linear infinite;
+  }
+
+  @keyframes border-glow-anim {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+
+  .typing-cursor::after {
+    content: '_';
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
 }
