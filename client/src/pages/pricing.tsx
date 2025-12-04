@@ -1,6 +1,39 @@
 import { motion } from "framer-motion";
 import { Check, X, Zap, Shield, Globe, Users, ArrowRight, Cpu } from "lucide-react";
-import { Link } from "wouter";
+
+function Navigation() {
+  return (
+    <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
+      <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <div className="w-3 h-3 bg-primary animate-pulse" />
+        <span className="font-mono font-bold text-lg tracking-widest">INFRA_V1</span>
+      </a>
+      
+      <div className="hidden md:flex items-center gap-8 font-mono text-sm">
+        {[
+          { label: 'NODES', href: '/nodes' },
+          { label: 'PRICING', href: '/pricing' },
+          { label: 'DASHBOARD', href: '/dashboard' },
+          { label: 'DOCS', href: '/docs' },
+        ].map((item) => (
+          <a 
+            key={item.label} 
+            href={item.href} 
+            className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors"
+          >
+            {item.label}
+          </a>
+        ))}
+      </div>
+
+      <a href="/connect">
+        <button className="bg-primary text-black font-mono font-bold px-6 py-2 text-sm hover:bg-white transition-colors flex items-center gap-2 border border-transparent hover:border-black">
+          CONNECT <ArrowRight className="w-4 h-4" />
+        </button>
+      </a>
+    </nav>
+  );
+}
 
 const tiers = [
   {
@@ -102,9 +135,10 @@ const faqs = [
 
 export default function Pricing() {
   return (
-    <div className="min-h-screen bg-background text-foreground pt-20 pb-24">
+    <div className="min-h-screen bg-background text-foreground">
+      <Navigation />
       {/* Header */}
-      <div className="px-6 md:px-12 max-w-7xl mx-auto mb-16">
+      <div className="px-6 md:px-12 max-w-7xl mx-auto mb-16 pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
