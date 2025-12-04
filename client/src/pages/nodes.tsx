@@ -43,10 +43,10 @@ function Navigation() {
       <div className="hidden md:flex items-center gap-8 font-mono text-sm">
         {[
           { label: 'NODES', href: '/nodes' },
+          { label: 'DEPLOY', href: '/deploy' },
           { label: 'AI COPILOT', href: '/copilot' },
           { label: 'PRICING', href: '/pricing' },
           { label: 'DASHBOARD', href: '/dashboard' },
-          { label: 'DOCS', href: '/docs' },
         ].map((item) => (
           <a 
             key={item.label} 

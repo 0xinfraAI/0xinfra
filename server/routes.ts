@@ -5,6 +5,7 @@ import { insertConnectionSchema } from "@shared/schema";
 import { validateApiKey, rpcProxyHandler } from "./rpc-proxy";
 import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
 import { generateCopilotResponse, getQuickSuggestions, type CopilotMessage, type CopilotContext } from "./copilot";
+import { compileSolidity, getVerificationUrl, getExplorerTxUrl } from "./contract-compiler";
 
 interface NetworkStatus {
   slug: string;
@@ -224,6 +225,53 @@ export async function registerRoutes(
     };
     const suggestions = getQuickSuggestions(context);
     res.json({ suggestions });
+  });
+
+  // Smart Contract Compilation API
+  app.post("/api/contracts/compile", (req, res) => {
+    try {
+      const { sourceCode, fileName } = req.body;
+      
+      if (!sourceCode || typeof sourceCode !== "string") {
+        return res.status(400).json({ error: "Source code is required" });
+      }
+
+      const result = compileSolidity(sourceCode, fileName || "Contract.sol");
+      res.json(result);
+    } catch (error: any) {
+      console.error("Contract compilation error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get verification URL for deployed contract
+  app.get("/api/contracts/verification-url", (req, res) => {
+    const { network, address } = req.query;
+    
+    if (!network || !address) {
+      return res.status(400).json({ error: "Network and address are required" });
+    }
+
+    const verificationUrl = getVerificationUrl(network as string, address as string);
+    const txUrl = getExplorerTxUrl(network as string, address as string);
+    
+    res.json({ 
+      verificationUrl,
+      explorerUrl: txUrl,
+    });
+  });
+
+  // Get EVM networks for deployment (exclude Solana)
+  app.get("/api/contracts/networks", (req, res) => {
+    const networks = getAllNetworks()
+      .filter(n => n.ecosystem === "evm")
+      .map(n => ({
+        name: n.name,
+        slug: n.slug,
+        chainId: n.chainId,
+        type: n.type,
+      }));
+    res.json(networks);
   });
 
   return httpServer;
