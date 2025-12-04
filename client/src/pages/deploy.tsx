@@ -186,23 +186,12 @@ export default function DeployPage() {
 
   const generateContractMutation = useMutation({
     mutationFn: async (prompt: string) => {
-      const res = await fetch("/api/copilot/chat", {
+      const res = await fetch("/api/copilot/generate-contract", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [
-            {
-              role: "user",
-              content: `Generate a complete, production-ready Solidity smart contract based on this request: "${prompt}". 
-              
-IMPORTANT: Return ONLY the Solidity code wrapped in a code block. No explanations before or after.
-Start with // SPDX-License-Identifier and pragma solidity.
-Include all necessary imports if using OpenZeppelin.
-Add proper events and error handling.
-Make it deployable as-is.`,
-            },
-          ],
-          context: { selectedNetwork, mode: "quick" },
+          prompt,
+          network: selectedNetworkInfo?.name || "Ethereum",
         }),
       });
       if (!res.ok) throw new Error("Failed to generate contract");
@@ -216,6 +205,7 @@ Make it deployable as-is.`,
         setSourceCode(data.response);
       }
       setAiPrompt("");
+      setCompileResult(null);
     },
   });
 
@@ -224,29 +214,16 @@ Make it deployable as-is.`,
     
     setIsAiFixing(true);
     try {
-      const errorMessages = compileResult.errors.map(e => e.message).join("\n");
-      const res = await fetch("/api/copilot/chat", {
+      const res = await fetch("/api/copilot/fix-errors", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [
-            {
-              role: "user",
-              content: `Fix the following Solidity compilation errors in this contract.
-
-ERRORS:
-${errorMessages}
-
-CURRENT CONTRACT:
-\`\`\`solidity
-${sourceCode}
-\`\`\`
-
-IMPORTANT: Return ONLY the corrected Solidity code wrapped in a code block. No explanations before or after.
-Fix all the errors while preserving the original contract's functionality.`,
-            },
-          ],
-          context: { selectedNetwork, mode: "quick" },
+          sourceCode,
+          errors: compileResult.errors.map(e => ({
+            message: e.formattedMessage || e.message,
+            severity: e.severity,
+          })),
+          network: selectedNetworkInfo?.name || "Ethereum",
         }),
       });
       if (!res.ok) throw new Error("Failed to get AI fix");

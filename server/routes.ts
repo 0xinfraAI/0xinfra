@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { insertConnectionSchema } from "@shared/schema";
 import { validateApiKey, rpcProxyHandler } from "./rpc-proxy";
 import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
-import { generateCopilotResponse, getQuickSuggestions, type CopilotMessage, type CopilotContext } from "./copilot";
+import { generateCopilotResponse, getQuickSuggestions, generateSmartContract, fixContractErrors, type CopilotMessage, type CopilotContext, type ContractGenerationRequest, type ErrorFixRequest } from "./copilot";
 import { compileSolidity, getVerificationUrl, getExplorerTxUrl, getExplorerAddressUrl } from "./contract-compiler";
 
 interface NetworkStatus {
@@ -225,6 +225,44 @@ export async function registerRoutes(
     };
     const suggestions = getQuickSuggestions(context);
     res.json({ suggestions });
+  });
+
+  // Specialized AI Contract Generator (A+ Quality)
+  app.post("/api/copilot/generate-contract", async (req, res) => {
+    try {
+      const { prompt, network, contractType } = req.body as ContractGenerationRequest;
+
+      if (!prompt || typeof prompt !== "string") {
+        return res.status(400).json({ error: "Prompt is required" });
+      }
+
+      const response = await generateSmartContract({ prompt, network, contractType });
+      res.json({ response });
+    } catch (error: any) {
+      console.error("Contract generation error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Specialized AI Error Fixer (A+ Quality)
+  app.post("/api/copilot/fix-errors", async (req, res) => {
+    try {
+      const { sourceCode, errors, network } = req.body as ErrorFixRequest;
+
+      if (!sourceCode || typeof sourceCode !== "string") {
+        return res.status(400).json({ error: "Source code is required" });
+      }
+
+      if (!errors || !Array.isArray(errors) || errors.length === 0) {
+        return res.status(400).json({ error: "Errors array is required" });
+      }
+
+      const response = await fixContractErrors({ sourceCode, errors, network });
+      res.json({ response });
+    } catch (error: any) {
+      console.error("Error fix error:", error);
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // Smart Contract Compilation API
