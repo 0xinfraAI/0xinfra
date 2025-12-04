@@ -67,14 +67,17 @@ export async function validateApiKey(
   res: Response,
   next: NextFunction
 ) {
-  const apiKey = req.headers["x-infra-key"] as string || req.query.apiKey as string;
+  // Support API key in: URL path, header, or query parameter
+  const apiKey = req.params.apiKey as string || 
+                 req.headers["x-infra-key"] as string || 
+                 req.query.apiKey as string;
   
   if (!apiKey) {
     return res.status(401).json({
       jsonrpc: "2.0",
       error: {
         code: -32001,
-        message: "Missing API key. Provide X-INFRA-KEY header or apiKey query parameter.",
+        message: "Missing API key. Provide in URL path, X-INFRA-KEY header, or apiKey query parameter.",
       },
       id: null,
     });

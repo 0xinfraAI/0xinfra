@@ -264,13 +264,43 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Your Endpoints */}
+            <div className="bg-black border border-border p-4 mb-4">
+              <span className="text-xs font-mono text-muted-foreground block mb-3">YOUR ENDPOINTS</span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground w-12">HTTP:</span>
+                  <code className="text-primary font-mono text-sm flex-1 truncate">
+                    {window.location.origin}/rpc/ethereum/{connections[0].apiKey}
+                  </code>
+                  <button
+                    onClick={() => copyToClipboard(`${window.location.origin}/rpc/ethereum/${connections[0].apiKey}`, "http-url")}
+                    className="text-muted-foreground hover:text-white transition-colors shrink-0"
+                  >
+                    {copiedId === "http-url" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground w-12">WSS:</span>
+                  <code className="text-primary font-mono text-sm flex-1 truncate">
+                    {window.location.origin.replace("http", "ws")}/ws/ethereum/{connections[0].apiKey}
+                  </code>
+                  <button
+                    onClick={() => copyToClipboard(`${window.location.origin.replace("http", "ws")}/ws/ethereum/${connections[0].apiKey}`, "ws-url")}
+                    className="text-muted-foreground hover:text-white transition-colors shrink-0"
+                  >
+                    {copiedId === "ws-url" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-black border border-border p-4 mb-4 overflow-x-auto">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono text-muted-foreground">CURL EXAMPLE</span>
+                <span className="text-xs font-mono text-muted-foreground">CURL EXAMPLE (URL-BASED AUTH)</span>
                 <button
-                  onClick={() => copyToClipboard(`curl -X POST ${window.location.origin}/rpc/ethereum \\
+                  onClick={() => copyToClipboard(`curl -X POST ${window.location.origin}/rpc/ethereum/${connections[0].apiKey} \\
   -H "Content-Type: application/json" \\
-  -H "X-INFRA-KEY: ${connections[0].apiKey}" \\
   -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`, "curl")}
                   className="text-muted-foreground hover:text-white transition-colors"
                 >
@@ -278,9 +308,8 @@ export default function Dashboard() {
                 </button>
               </div>
               <pre className="text-primary font-mono text-sm whitespace-pre-wrap">
-{`curl -X POST ${window.location.origin}/rpc/ethereum \\
+{`curl -X POST ${window.location.origin}/rpc/ethereum/${connections[0].apiKey} \\
   -H "Content-Type: application/json" \\
-  -H "X-INFRA-KEY: ${connections[0].apiKey}" \\
   -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`}
               </pre>
             </div>
@@ -291,9 +320,7 @@ export default function Dashboard() {
                   <span className="text-xs font-mono text-muted-foreground">ETHERS.JS</span>
                   <button
                     onClick={() => copyToClipboard(`const provider = new ethers.JsonRpcProvider(
-  "${window.location.origin}/rpc/ethereum",
-  undefined,
-  { staticNetwork: true, headers: { "X-INFRA-KEY": "${connections[0].apiKey}" } }
+  "${window.location.origin}/rpc/ethereum/${connections[0].apiKey}"
 );`, "ethers")}
                     className="text-muted-foreground hover:text-white transition-colors"
                   >
@@ -302,26 +329,53 @@ export default function Dashboard() {
                 </div>
                 <pre className="text-primary font-mono text-xs overflow-x-auto">
 {`const provider = new ethers.JsonRpcProvider(
-  "${window.location.origin}/rpc/ethereum",
-  undefined,
-  { staticNetwork: true, headers: { "X-INFRA-KEY": "YOUR_KEY" } }
+  "${window.location.origin}/rpc/ethereum/${connections[0].apiKey}"
 );`}
                 </pre>
               </div>
 
               <div className="bg-black border border-border p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-mono text-muted-foreground">AVAILABLE NETWORKS</span>
+                  <span className="text-xs font-mono text-muted-foreground">WEBSOCKET SUBSCRIPTION</span>
+                  <button
+                    onClick={() => copyToClipboard(`const ws = new WebSocket(
+  "${window.location.origin.replace("http", "ws")}/ws/ethereum/${connections[0].apiKey}"
+);
+ws.onopen = () => {
+  ws.send(JSON.stringify({
+    jsonrpc: "2.0",
+    method: "eth_subscribe",
+    params: ["newHeads"],
+    id: 1
+  }));
+};`, "ws")}
+                    className="text-muted-foreground hover:text-white transition-colors"
+                  >
+                    {copiedId === "ws" ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {["ethereum", "polygon", "arbitrum", "optimism", "base"].map(net => (
-                    <span key={net} className="bg-white/10 px-2 py-1 text-xs font-mono">{net}</span>
-                  ))}
-                </div>
-                <p className="text-xs font-mono text-muted-foreground mt-3">
-                  + testnets: ethereum-sepolia, polygon-mumbai, etc.
-                </p>
+                <pre className="text-primary font-mono text-xs overflow-x-auto">
+{`const ws = new WebSocket(
+  "wss://your-domain/ws/ethereum/YOUR_KEY"
+);
+ws.send(JSON.stringify({
+  method: "eth_subscribe",
+  params: ["newHeads"], id: 1
+}));`}
+                </pre>
               </div>
+            </div>
+
+            <div className="mt-4 bg-black border border-border p-4">
+              <span className="text-xs font-mono text-muted-foreground block mb-3">AVAILABLE NETWORKS</span>
+              <div className="flex flex-wrap gap-2">
+                {["ethereum", "polygon", "arbitrum", "optimism", "base"].map(net => (
+                  <span key={net} className="bg-white/10 px-2 py-1 text-xs font-mono">{net}</span>
+                ))}
+              </div>
+              <p className="text-xs font-mono text-muted-foreground mt-3">
+                + testnets: ethereum-sepolia, polygon-mumbai, arbitrum-sepolia, optimism-sepolia, base-sepolia
+              </p>
             </div>
           </div>
         )}

@@ -21,7 +21,9 @@ export async function registerRoutes(
   });
 
   // RPC Proxy endpoint - validates API key and proxies to provider
+  // Supports both header-based auth (X-INFRA-KEY) and URL-based auth
   app.post("/rpc/:network", validateApiKey, rpcProxyHandler);
+  app.post("/rpc/:network/:apiKey", validateApiKey, rpcProxyHandler);
 
   // Connection management
   app.post("/api/connections", async (req, res) => {

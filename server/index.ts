@@ -2,9 +2,28 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { WebSocketServer } from "ws";
+import { setupWebSocketProxy } from "./ws-proxy";
 
 const app = express();
 const httpServer = createServer(app);
+
+// Setup WebSocket server for RPC subscriptions
+// Use noServer mode and only handle /ws paths to avoid conflict with Vite HMR
+const wss = new WebSocketServer({ noServer: true });
+setupWebSocketProxy(wss);
+
+httpServer.on("upgrade", (request, socket, head) => {
+  const pathname = request.url || "";
+  
+  // Only handle WebSocket connections for /ws/* paths (our RPC subscriptions)
+  if (pathname.startsWith("/ws/")) {
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      wss.emit("connection", ws, request);
+    });
+  }
+  // Let other WebSocket connections (like Vite HMR) pass through
+});
 
 declare module "http" {
   interface IncomingMessage {
