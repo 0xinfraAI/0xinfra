@@ -516,7 +516,7 @@ export default function Docs() {
         <div className="p-5 border-b border-border">
           <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="w-3 h-3 bg-primary animate-pulse" />
-            <span className="font-mono font-bold tracking-widest">INFRA_V1</span>
+            <span className="font-mono font-bold tracking-widest">0xinfra</span>
           </a>
         </div>
 
@@ -612,7 +612,7 @@ export default function Docs() {
           {activeSection === "overview" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
               <p className="text-2xl text-muted-foreground leading-relaxed">
-                Welcome to INFRA_V1 — your gateway to blockchain infrastructure. 
+                Welcome to 0xinfra — your gateway to blockchain infrastructure. 
                 We make it simple to connect to any blockchain network with a single API.
               </p>
 
@@ -640,7 +640,7 @@ export default function Docs() {
               <div>
                 <h2 className="text-2xl font-bold mb-4">What We Offer</h2>
                 <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                  INFRA_V1 isn't just another node provider. We've built a complete platform 
+                  0xinfra isn't just another node provider. We've built a complete platform 
                   for blockchain developers, combining reliable infrastructure with powerful tools.
                 </p>
 
@@ -759,12 +759,12 @@ export default function Docs() {
 
                 <CodeTabs
                   examples={{
-                    curl: `curl https://eth-mainnet.infra.v1/v2/YOUR_API_KEY \\
+                    curl: `curl https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`,
                     javascript: `const response = await fetch(
-  'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+  'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -785,7 +785,7 @@ console.log('Current block:', blockNumber);`,
                     python: `import requests
 
 response = requests.post(
-    'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+    'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
     json={
         'jsonrpc': '2.0',
         'method': 'eth_blockNumber',
@@ -835,7 +835,7 @@ print(f'Current block: {block_number}')`
           {activeSection === "authentication" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
               <p className="text-2xl text-muted-foreground leading-relaxed">
-                Every request to INFRA_V1 needs an API key. This keeps your usage tracked, 
+                Every request to 0xinfra needs an API key. This keeps your usage tracked, 
                 your rate limits respected, and your data secure.
               </p>
 
@@ -857,7 +857,7 @@ print(f'Current block: {block_number}')`
                 title="Authentication Flow"
                 chart={`sequenceDiagram
     participant You as Your App
-    participant Edge as INFRA_V1
+    participant Edge as 0xinfra
     participant Chain as Blockchain
     
     You->>Edge: Request with API Key
@@ -882,7 +882,7 @@ print(f'Current block: {block_number}')`
               </p>
 
               <CodeBlock
-                code={`https://{network}.infra.v1/v2/{YOUR_API_KEY}`}
+                code={`https://{network}.0xinfra.io/v2/{YOUR_API_KEY}`}
                 language="url"
               />
 
@@ -891,7 +891,7 @@ print(f'Current block: {block_number}')`
               </p>
 
               <CodeBlock
-                code={`https://eth-mainnet.infra.v1/v2/infra_abc123xyz789`}
+                code={`https://eth-mainnet.0xinfra.io/v2/infra_abc123xyz789`}
                 language="url"
               />
 
@@ -1138,7 +1138,7 @@ print(f'Current block: {block_number}')`
                         <td className="p-5 font-sans">{row.network}</td>
                         <td className="p-5 text-muted-foreground">{row.chainId}</td>
                         <td className="p-5">
-                          <code className="text-primary">{row.endpoint}.infra.v1</code>
+                          <code className="text-primary">{row.endpoint}.0xinfra.io</code>
                         </td>
                         <td className="p-5">
                           <span className="flex items-center gap-2">
@@ -1173,7 +1173,7 @@ print(f'Current block: {block_number}')`
                   <tbody className="font-mono text-sm">
                     <tr className="border-b border-border bg-black">
                       <td className="p-5 font-sans">Solana Mainnet</td>
-                      <td className="p-5"><code className="text-primary">solana-mainnet.infra.v1</code></td>
+                      <td className="p-5"><code className="text-primary">solana-mainnet.0xinfra.io</code></td>
                       <td className="p-5">
                         <span className="flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full bg-green-500" />
@@ -1183,7 +1183,7 @@ print(f'Current block: {block_number}')`
                     </tr>
                     <tr className="bg-neutral-950/50">
                       <td className="p-5 font-sans">Solana Devnet</td>
-                      <td className="p-5"><code className="text-primary">solana-devnet.infra.v1</code></td>
+                      <td className="p-5"><code className="text-primary">solana-devnet.0xinfra.io</code></td>
                       <td className="p-5">
                         <span className="flex items-center gap-2">
                           <span className="w-2 h-2 rounded-full bg-green-500" />
@@ -1229,12 +1229,12 @@ print(f'Current block: {block_number}')`
                 endpoint="eth_blockNumber"
                 description="Returns the number of the most recent block on the chain. This is often the first method developers call to verify their connection is working."
                 examples={{
-                  curl: `curl https://eth-mainnet.infra.v1/v2/YOUR_API_KEY \\
+                  curl: `curl https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'`,
                   javascript: `const response = await fetch(
-  'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+  'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1252,7 +1252,7 @@ console.log('Block:', parseInt(result, 16));`,
                   python: `import requests
 
 response = requests.post(
-    'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+    'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
     json={
         'jsonrpc': '2.0',
         'method': 'eth_blockNumber',
@@ -1280,7 +1280,7 @@ print(f"Block: {int(result, 16)}")`
                   { name: "block", type: "string", required: true, description: "Block number or 'latest', 'earliest', 'pending'" }
                 ]}
                 examples={{
-                  curl: `curl https://eth-mainnet.infra.v1/v2/YOUR_API_KEY \\
+                  curl: `curl https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -1290,7 +1290,7 @@ print(f"Block: {int(result, 16)}")`
     "id":1
   }'`,
                   javascript: `const response = await fetch(
-  'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+  'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1312,7 +1312,7 @@ console.log(\`Balance: \${balanceInEth} ETH\`);`,
                   python: `import requests
 
 response = requests.post(
-    'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+    'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
     json={
         'jsonrpc': '2.0',
         'method': 'eth_getBalance',
@@ -1352,7 +1352,7 @@ print(f"Balance: {balance_eth} ETH")`
                   { name: "signedTx", type: "string", required: true, description: "The signed transaction data (hex-encoded with 0x prefix)" }
                 ]}
                 examples={{
-                  curl: `curl https://eth-mainnet.infra.v1/v2/YOUR_API_KEY \\
+                  curl: `curl https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -1365,7 +1365,7 @@ print(f"Balance: {balance_eth} ETH")`
 const signedTx = await wallet.signTransaction(tx);
 
 const response = await fetch(
-  'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+  'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1386,7 +1386,7 @@ console.log('Transaction sent:', txHash);`,
 signed_tx = w3.eth.account.sign_transaction(tx, private_key)
 
 response = requests.post(
-    'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+    'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
     json={
         'jsonrpc': '2.0',
         'method': 'eth_sendRawTransaction',
@@ -1439,7 +1439,7 @@ print(f"Transaction sent: {tx_hash}")`
                   { name: "pageSize", type: "number", required: false, description: "Number of results per page (default: 100, max: 1000)" }
                 ]}
                 examples={{
-                  curl: `curl https://eth-mainnet.infra.v1/v2/YOUR_API_KEY \\
+                  curl: `curl https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -1449,7 +1449,7 @@ print(f"Transaction sent: {tx_hash}")`
     "id":1
   }'`,
                   javascript: `const response = await fetch(
-  'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+  'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1470,7 +1470,7 @@ result.tokenBalances.forEach(token => {
                   python: `import requests
 
 response = requests.post(
-    'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+    'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
     json={
         'jsonrpc': '2.0',
         'method': 'infra_getTokenBalances',
@@ -1527,7 +1527,7 @@ for token in tokens:
                   { name: "contractAddresses", type: "string[]", required: false, description: "Optional array of NFT contract addresses to filter by" }
                 ]}
                 examples={{
-                  curl: `curl https://eth-mainnet.infra.v1/v2/YOUR_API_KEY \\
+                  curl: `curl https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -1537,7 +1537,7 @@ for token in tokens:
     "id":1
   }'`,
                   javascript: `const response = await fetch(
-  'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+  'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1559,7 +1559,7 @@ result.ownedNfts.forEach(nft => {
                   python: `import requests
 
 response = requests.post(
-    'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY',
+    'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY',
     json={
         'jsonrpc': '2.0',
         'method': 'infra_getNFTs',
@@ -1624,7 +1624,7 @@ for nft in result['ownedNfts']:
                   { name: "pubkey", type: "string", required: true, description: "Base-58 encoded public key of the account to query" }
                 ]}
                 examples={{
-                  curl: `curl https://solana-mainnet.infra.v1/v2/YOUR_API_KEY \\
+                  curl: `curl https://solana-mainnet.0xinfra.io/v2/YOUR_API_KEY \\
   -X POST \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -1634,7 +1634,7 @@ for nft in result['ownedNfts']:
     "params":["83astBRguLMdt2h5U1Tpdq5tjFoJ6noeGwaY3mDLVcri"]
   }'`,
                   javascript: `const response = await fetch(
-  'https://solana-mainnet.infra.v1/v2/YOUR_API_KEY',
+  'https://solana-mainnet.0xinfra.io/v2/YOUR_API_KEY',
   {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1653,7 +1653,7 @@ console.log(\`Balance: \${balanceInSol} SOL\`);`,
                   python: `import requests
 
 response = requests.post(
-    'https://solana-mainnet.infra.v1/v2/YOUR_API_KEY',
+    'https://solana-mainnet.0xinfra.io/v2/YOUR_API_KEY',
     json={
         'jsonrpc': '2.0',
         'id': 1,
@@ -1682,7 +1682,7 @@ print(f"Balance: {balance_sol} SOL")`
           {activeSection === "sdk-javascript" && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
               <p className="text-2xl text-muted-foreground leading-relaxed">
-                Our JavaScript SDK makes working with INFRA_V1 even easier. 
+                Our JavaScript SDK makes working with 0xinfra even easier. 
                 It handles the low-level details so you can focus on building.
               </p>
 
@@ -1727,7 +1727,7 @@ console.log('Balance:', infra.utils.formatEther(balance), 'ETH');`}
               <h2 className="text-2xl font-bold mb-4">Using with ethers.js</h2>
 
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                Already using ethers.js? You can use INFRA_V1 as your provider without 
+                Already using ethers.js? You can use 0xinfra as your provider without 
                 changing any of your existing code.
               </p>
 
@@ -1736,7 +1736,7 @@ console.log('Balance:', infra.utils.formatEther(balance), 'ETH');`}
 
 // Just swap in our URL as your provider
 const provider = new ethers.JsonRpcProvider(
-  'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY'
+  'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY'
 );
 
 // All your existing ethers.js code works unchanged
@@ -1772,7 +1772,7 @@ const network = await provider.getNetwork();`}
               <h2 className="text-2xl font-bold mb-4">Quick Start</h2>
 
               <CodeBlock
-                code={`from infra_v1 import Infra
+                code={`from oxinfra import Infra
 
 # Initialize with your API key
 infra = Infra(
@@ -1797,16 +1797,16 @@ print(f'Balance: {infra.utils.format_ether(balance)} ETH')`}
               <h2 className="text-2xl font-bold mb-4">Using with web3.py</h2>
 
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                If you're already using web3.py, you can use INFRA_V1 as your provider 
+                If you're already using web3.py, you can use 0xinfra as your provider 
                 with just one line change.
               </p>
 
               <CodeBlock
                 code={`from web3 import Web3
 
-# Use INFRA_V1 as your HTTP provider
+# Use 0xinfra as your HTTP provider
 w3 = Web3(Web3.HTTPProvider(
-    'https://eth-mainnet.infra.v1/v2/YOUR_API_KEY'
+    'https://eth-mainnet.0xinfra.io/v2/YOUR_API_KEY'
 ))
 
 # All your existing web3.py code works unchanged
@@ -2011,7 +2011,7 @@ contract SimpleStorage {
                 title="Webhook Flow"
                 chart={`sequenceDiagram
     participant Chain as Blockchain
-    participant INFRA as INFRA_V1
+    participant INFRA as 0xinfra
     participant You as Your Server
     
     Chain->>INFRA: New Transaction

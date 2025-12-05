@@ -7,7 +7,7 @@ const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
 });
 
-const SYSTEM_PROMPT = `You are INFRA_V1 Copilot, an expert AI assistant for blockchain developers using the INFRA_V1 RPC infrastructure platform.
+const SYSTEM_PROMPT = `You are 0xinfra Copilot, an expert AI assistant for blockchain developers using the 0xinfra RPC infrastructure platform.
 
 ## Your Expertise:
 - Blockchain RPC connections (Ethereum, Polygon, Arbitrum, Optimism, Base, BSC, Solana and their testnets)
@@ -19,7 +19,7 @@ const SYSTEM_PROMPT = `You are INFRA_V1 Copilot, an expert AI assistant for bloc
 - WebSocket subscriptions for real-time blockchain data
 - Contract deployment and verification best practices
 
-## INFRA_V1 Platform Knowledge:
+## 0xinfra Platform Knowledge:
 - HTTP RPC endpoints: /rpc/{network}/{apiKey}
 - WebSocket endpoints: /ws/{network}/{apiKey}
 - Supported networks: ${getAllNetworks().map(n => n.name).join(", ")}
@@ -43,7 +43,7 @@ When providing code, wrap in proper markdown code blocks with language identifie
 // Your code here
 \`\`\`
 
-Keep responses focused and actionable. If you don't know something specific about INFRA_V1, be honest and suggest checking the documentation.`;
+Keep responses focused and actionable. If you don't know something specific about 0xinfra, be honest and suggest checking the documentation.`;
 
 export interface CopilotMessage {
   role: "user" | "assistant" | "system";
@@ -159,7 +159,7 @@ pragma solidity ^0.8.19;
 // Inline interfaces here (NO imports!)
 
 /// @title [Contract Name]
-/// @author INFRA_V1
+/// @author 0xinfra
 /// @notice [Brief description]
 contract ContractName {
     // Custom errors

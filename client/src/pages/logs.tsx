@@ -355,7 +355,7 @@ export default function LogsPage() {
               <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <ArrowLeft className="w-5 h-5 text-muted-foreground" />
                 <div className="w-3 h-3 bg-primary animate-pulse" />
-                <span className="font-mono font-bold tracking-widest">INFRA_V1</span>
+                <span className="font-mono font-bold tracking-widest">0xinfra</span>
               </a>
               <span className="text-muted-foreground">/</span>
               <h1 className="font-bold text-lg flex items-center gap-2">

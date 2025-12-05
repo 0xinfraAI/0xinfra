@@ -37,7 +37,7 @@ function Navigation() {
     <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
       <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
         <div className="w-3 h-3 bg-primary animate-pulse" />
-        <span className="font-mono font-bold text-lg tracking-widest">INFRA_V1</span>
+        <span className="font-mono font-bold text-lg tracking-widest">0xinfra</span>
       </a>
       
       <div className="hidden md:flex items-center gap-8 font-mono text-sm">

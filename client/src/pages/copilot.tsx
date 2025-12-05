@@ -39,7 +39,7 @@ const TOPIC_CATEGORIES = [
     title: "RPC & Connections",
     icon: Globe,
     topics: [
-      "How do I connect to Ethereum using INFRA_V1?",
+      "How do I connect to Ethereum using 0xinfra?",
       "What's the difference between HTTP and WebSocket?",
       "How to handle RPC rate limits?",
       "Best practices for connection pooling",
@@ -59,7 +59,7 @@ const TOPIC_CATEGORIES = [
     title: "Web3 Development",
     icon: Code2,
     topics: [
-      "Setting up ethers.js with INFRA_V1",
+      "Setting up ethers.js with 0xinfra",
       "Web3.py quickstart guide",
       "Listening to blockchain events",
       "Handling transaction confirmations",
@@ -109,7 +109,7 @@ function Navigation() {
     <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
       <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
         <div className="w-3 h-3 bg-primary animate-pulse" />
-        <span className="font-mono font-bold text-lg tracking-widest">INFRA_V1</span>
+        <span className="font-mono font-bold text-lg tracking-widest">0xinfra</span>
       </a>
       
       <div className="hidden md:flex items-center gap-8 font-mono text-sm">
@@ -218,7 +218,7 @@ function MessageBubble({ message }: { message: Message }) {
         {!isUser && (
           <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border">
             <Bot className="w-5 h-5 text-primary" />
-            <span className="font-mono text-sm text-primary uppercase tracking-wider">INFRA_V1 Copilot</span>
+            <span className="font-mono text-sm text-primary uppercase tracking-wider">0xinfra Copilot</span>
           </div>
         )}
         <div className="font-mono text-sm leading-relaxed">

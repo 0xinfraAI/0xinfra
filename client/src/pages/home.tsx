@@ -39,7 +39,7 @@ export default function Home() {
       <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-primary animate-pulse" />
-          <span className="font-mono font-bold text-lg tracking-widest">INFRA_V1</span>
+          <span className="font-mono font-bold text-lg tracking-widest">0xinfra</span>
         </div>
         
         <div className="hidden md:flex items-center gap-8 font-mono text-sm">
@@ -334,7 +334,7 @@ export default function Home() {
           <div className="font-mono text-sm md:text-lg space-y-4">
             <div className="flex gap-4">
                <span className="text-primary">$</span>
-               <span className="text-white">npm install @infra_v1/sdk</span>
+               <span className="text-white">npm install @0xinfra/sdk</span>
             </div>
             <div className="text-neutral-500">
                [+] Installing dependencies...<br/>
@@ -371,11 +371,11 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-background py-12 px-4 md:px-12 flex flex-col md:flex-row justify-between items-start gap-12">
         <div>
-          <h4 className="text-3xl font-black uppercase tracking-widest mb-4">INFRA_V1</h4>
+          <h4 className="text-3xl font-black uppercase tracking-widest mb-4">0xinfra</h4>
           <p className="font-mono text-muted-foreground max-w-xs text-sm">
             Building the decentralized web, one block at a time.
             <br/><br/>
-            © 2025 INFRA PROTOCOL
+            © 2025 0xinfra
           </p>
         </div>
         

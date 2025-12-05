@@ -1,6 +1,6 @@
 # Overview
 
-INFRA_V1 is a blockchain infrastructure platform built with a brutalist design aesthetic. The application provides a web interface for managing blockchain node connections and infrastructure, offering both free and premium tiers for accessing various blockchain networks. The platform features a dashboard for monitoring connections, API key management, and a node marketplace for deploying blockchain infrastructure.
+0xinfra is a blockchain infrastructure platform built with a brutalist design aesthetic. The application provides a web interface for managing blockchain node connections and infrastructure, offering both free and premium tiers for accessing various blockchain networks. The platform features a dashboard for monitoring connections, API key management, and a node marketplace for deploying blockchain infrastructure.
 
 # User Preferences
 
@@ -84,7 +84,7 @@ The AI Copilot is a context-aware blockchain development assistant powered by Op
 **Backend Integration:**
 - `/api/copilot/chat`: Chat endpoint with message history and context
 - `/api/copilot/suggestions`: Dynamic suggestions based on network context
-- Uses OpenAI GPT model with INFRA_V1-specific system prompt
+- Uses OpenAI GPT model with 0xinfra-specific system prompt
 
 ## Smart Contract Deployment Feature (Remix-Style IDE)
 

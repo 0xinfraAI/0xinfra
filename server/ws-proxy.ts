@@ -7,11 +7,11 @@ const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
 
 function sanitizeString(str: string): string {
   return str
-    .replace(/alchemy/gi, "INFRA_V1")
-    .replace(/Alchemy/g, "INFRA_V1")
-    .replace(/api\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/g\.alchemy\.com/gi, "infra.v1")
-    .replace(/[a-zA-Z0-9-]+\.g\.alchemy\.com/gi, "rpc.infra.v1");
+    .replace(/alchemy/gi, "0xinfra")
+    .replace(/Alchemy/g, "0xinfra")
+    .replace(/api\.g\.alchemy\.com/gi, "rpc.0xinfra.io")
+    .replace(/g\.alchemy\.com/gi, "0xinfra.io")
+    .replace(/[a-zA-Z0-9-]+\.g\.alchemy\.com/gi, "rpc.0xinfra.io");
 }
 
 function sanitizeMessage(data: any): any {
@@ -116,8 +116,8 @@ export function setupWebSocketProxy(wss: WebSocket.Server) {
     // Connect to Alchemy WebSocket with proper headers
     const upstreamWs = new WebSocket(alchemyWsUrl, {
       headers: {
-        "Origin": req.headers.origin || "https://infra.v1",
-        "User-Agent": "INFRA_V1/1.0",
+        "Origin": req.headers.origin || "https://0xinfra.io",
+        "User-Agent": "0xinfra/1.0",
       },
       handshakeTimeout: 10000,
     });

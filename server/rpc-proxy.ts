@@ -59,16 +59,16 @@ function generateRequestId(): string {
 
 function sanitizeString(str: string): string {
   return str
-    .replace(/alchemy/gi, "INFRA_V1")
-    .replace(/Alchemy/g, "INFRA_V1")
-    .replace(/api\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/g\.alchemy\.com/gi, "infra.v1")
-    .replace(/eth-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/polygon-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/arb-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/opt-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/base-mainnet\.g\.alchemy\.com/gi, "rpc.infra.v1")
-    .replace(/[a-zA-Z0-9-]+\.g\.alchemy\.com/gi, "rpc.infra.v1");
+    .replace(/alchemy/gi, "0xinfra")
+    .replace(/Alchemy/g, "0xinfra")
+    .replace(/api\.g\.alchemy\.com/gi, "rpc.0xinfra.io")
+    .replace(/g\.alchemy\.com/gi, "0xinfra.io")
+    .replace(/eth-mainnet\.g\.alchemy\.com/gi, "rpc.0xinfra.io")
+    .replace(/polygon-mainnet\.g\.alchemy\.com/gi, "rpc.0xinfra.io")
+    .replace(/arb-mainnet\.g\.alchemy\.com/gi, "rpc.0xinfra.io")
+    .replace(/opt-mainnet\.g\.alchemy\.com/gi, "rpc.0xinfra.io")
+    .replace(/base-mainnet\.g\.alchemy\.com/gi, "rpc.0xinfra.io")
+    .replace(/[a-zA-Z0-9-]+\.g\.alchemy\.com/gi, "rpc.0xinfra.io");
 }
 
 function sanitizeResponse(data: any): any {

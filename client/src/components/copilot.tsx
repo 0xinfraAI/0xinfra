@@ -113,7 +113,7 @@ function MessageBubble({ message }: { message: Message }) {
         {!isUser && (
           <div className="flex items-center gap-2 mb-2 pb-2 border-b border-border">
             <Bot className="w-4 h-4 text-primary" />
-            <span className="font-mono text-xs text-primary uppercase tracking-wider">INFRA_V1 Copilot</span>
+            <span className="font-mono text-xs text-primary uppercase tracking-wider">0xinfra Copilot</span>
           </div>
         )}
         <div className="font-mono text-sm leading-relaxed">
@@ -283,7 +283,7 @@ export function Copilot({ context, isOpen, onToggle }: CopilotProps) {
                   </div>
                   <h4 className="font-bold uppercase mb-2">Welcome to AI Copilot</h4>
                   <p className="text-sm text-muted-foreground font-mono mb-4">
-                    Your blockchain development assistant. Ask me anything about RPC connections, Web3 code, or INFRA_V1.
+                    Your blockchain development assistant. Ask me anything about RPC connections, Web3 code, or 0xinfra.
                   </p>
                   
                   {/* Quick Suggestions */}
