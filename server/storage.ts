@@ -1,7 +1,8 @@
-import { type User, type UpsertUser, type Connection, type InsertConnection, type RpcLog, type InsertRpcLog, connections, users, rpcLogs } from "@shared/schema";
+import { type User, type UpsertUser, type InsertUser, type Connection, type InsertConnection, type RpcLog, type InsertRpcLog, connections, users, rpcLogs } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, like, or } from "drizzle-orm";
 import { randomBytes } from "crypto";
+import bcrypt from "bcrypt";
 
 export interface LogsFilter {
   network?: string;
@@ -13,10 +14,13 @@ export interface LogsFilter {
 }
 
 export interface IStorage {
-  // User operations (required for Replit Auth)
+  // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(userData: InsertUser): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   updateUserApiCalls(id: string, callsUsed: number): Promise<void>;
+  verifyPassword(email: string, password: string): Promise<User | null>;
   
   // Connection operations
   createConnection(connection: InsertConnection): Promise<Connection>;
@@ -38,14 +42,51 @@ function generateApiKey(): string {
   return `infra_${randomBytes(24).toString("hex")}`;
 }
 
+const SALT_ROUNDS = 10;
+
 export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
+    return user || undefined;
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const now = new Date();
+    const trialEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
+    const hashedPassword = await bcrypt.hash(userData.password, SALT_ROUNDS);
+    
+    const [user] = await db
+      .insert(users)
+      .values({
+        email: userData.email.toLowerCase(),
+        password: hashedPassword,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        trialStart: now,
+        trialEnd: trialEnd,
+        planType: "trial",
+        apiCallsUsed: 0,
+        apiCallsLimit: 100000,
+      })
+      .returning();
+    return user;
+  }
+
+  async verifyPassword(email: string, password: string): Promise<User | null> {
+    const user = await this.getUserByEmail(email);
+    if (!user) return null;
+    
+    const isValid = await bcrypt.compare(password, user.password);
+    return isValid ? user : null;
+  }
+
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Set trial period for new users (7 days)
     const now = new Date();
     const trialEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
     
