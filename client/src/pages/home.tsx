@@ -333,9 +333,9 @@ export default function Home() {
           <h2 className="text-5xl md:text-8xl font-black uppercase tracking-tighter mb-8">
             Ready to Scale?
           </h2>
-          <button className="bg-white text-black font-mono font-bold text-xl px-12 py-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all">
+          <a href="/register" className="inline-block bg-white text-black font-mono font-bold text-xl px-12 py-6 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all" data-testid="link-start-trial">
             START FREE TRIAL
-          </button>
+          </a>
         </div>
       </section>
 
