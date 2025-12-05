@@ -17,13 +17,14 @@ httpServer.on("upgrade", (request, socket, head) => {
   const pathname = request.url || "";
   
   // Only handle our RPC WebSocket connections on /ws/* paths
+  // Exclude /ws/logs which is handled by routes.ts WebSocket server
   // Other paths (like /vite-hmr) are handled by Vite's own upgrade listener
-  if (pathname.startsWith("/ws/")) {
+  if (pathname.startsWith("/ws/") && pathname !== "/ws/logs") {
     wss.handleUpgrade(request, socket, head, (ws) => {
       wss.emit("connection", ws, request);
     });
   }
-  // Don't touch other WebSocket connections - let Vite handle them
+  // Don't touch other WebSocket connections - let Vite or routes.ts handle them
 });
 
 declare module "http" {
