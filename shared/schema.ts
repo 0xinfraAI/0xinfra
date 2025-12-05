@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, serial, timestamp, boolean, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, serial, timestamp, boolean, integer, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -38,3 +38,27 @@ export const insertConnectionSchema = createInsertSchema(connections).omit({
 
 export type InsertConnection = z.infer<typeof insertConnectionSchema>;
 export type Connection = typeof connections.$inferSelect;
+
+export const rpcLogs = pgTable("rpc_logs", {
+  id: serial("id").primaryKey(),
+  requestId: text("request_id").notNull(),
+  connectionId: integer("connection_id"),
+  apiKeyLast4: text("api_key_last4"),
+  network: text("network").notNull(),
+  method: text("method").notNull(),
+  status: text("status").notNull(), // "success" | "error"
+  statusCode: integer("status_code"),
+  latency: integer("latency").notNull(), // in milliseconds
+  requestBody: jsonb("request_body"),
+  responseBody: jsonb("response_body"),
+  errorMessage: text("error_message"),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+export const insertRpcLogSchema = createInsertSchema(rpcLogs).omit({
+  id: true,
+  timestamp: true,
+});
+
+export type InsertRpcLog = z.infer<typeof insertRpcLogSchema>;
+export type RpcLog = typeof rpcLogs.$inferSelect;

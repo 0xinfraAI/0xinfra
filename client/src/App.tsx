@@ -12,6 +12,7 @@ import Pricing from "@/pages/pricing";
 import Dashboard from "@/pages/dashboard";
 import CopilotPage from "@/pages/copilot";
 import DeployPage from "@/pages/deploy";
+import LogsPage from "@/pages/logs";
 
 function Router() {
   return (
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/copilot" component={CopilotPage} />
       <Route path="/deploy" component={DeployPage} />
+      <Route path="/logs" component={LogsPage} />
       <Route component={NotFound} />
     </Switch>
   );

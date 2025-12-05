@@ -28,6 +28,7 @@ The frontend is built using React with TypeScript and Vite as the build tool. Th
 - Nodes: Node marketplace/explorer with live network status
 - Deploy: Smart contract deployment interface with wallet connection and AI contract generation
 - Copilot: Dedicated AI-powered blockchain development assistant with full-screen chat interface
+- Logs: Live RPC request logs with real-time streaming, filters, and detailed request/response inspection
 - Pricing: Tiered pricing plans
 - Docs: Comprehensive Alchemy-style documentation with interactive features
 
@@ -131,6 +132,44 @@ The Deploy page is a full-featured Remix-style IDE for writing, compiling, and d
 - Network switching via wallet_switchEthereumChain
 - Transaction monitoring via eth_getTransactionReceipt polling
 
+## Live Logs Feature
+
+The Logs page provides Alchemy-style real-time monitoring of all RPC requests flowing through the platform.
+
+**Features:**
+- Live streaming table with WebSocket connection for real-time updates
+- Stats panel showing requests/sec, total requests, error rate, avg latency
+- Filters for network and status (success/error)
+- Search functionality for method, request ID, network
+- Expandable rows showing full request/response JSON
+- Pause/resume streaming, clear logs functionality
+- Connection status indicator (LIVE/DISCONNECTED)
+
+**Backend Integration:**
+- `GET /api/logs`: Fetch logs with filter support (network, method, status, limit, offset, since)
+- `GET /api/logs/stats`: Aggregate statistics (total requests, error count, avg latency)
+- `GET /api/logs/recent`: Quick access to recent logs
+- `WebSocket /ws/logs`: Live log streaming with auto-reconnection
+
+**Data Model (rpc_logs table):**
+- requestId: Unique request identifier (req_xxxxx)
+- connectionId: Associated API connection
+- apiKeyLast4: Redacted API key (last 4 chars for security)
+- network: Target blockchain network
+- method: RPC method called
+- status: success/error
+- statusCode: HTTP status code
+- latency: Request duration in milliseconds
+- requestBody: Full request JSON (jsonb)
+- responseBody: Full response JSON (jsonb)
+- errorMessage: Error details if failed
+- timestamp: Request timestamp
+
+**RPC Proxy Logging:**
+- Every RPC request is automatically logged with full metadata
+- Logs are persisted to PostgreSQL and emitted to WebSocket listeners
+- API keys are redacted to last 4 characters for security
+
 ## Backend Architecture
 
 The backend is built with Express.js and TypeScript, following a modular structure with clear separation of concerns.
@@ -163,6 +202,7 @@ The backend is built with Express.js and TypeScript, following a modular structu
 **Database Tables:**
 - `users`: User authentication with username/password
 - `connections`: Blockchain node connections with API keys, network information, request tracking, and IP restrictions
+- `rpc_logs`: RPC request logs with request/response data, latency metrics, and error tracking
 
 **Data Models:**
 - Auto-generated UUID for user IDs

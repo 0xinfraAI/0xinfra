@@ -1,8 +1,61 @@
 import type { Request, Response, NextFunction } from "express";
 import { storage } from "./storage";
 import { getAlchemyUrl, getNetworkBySlug } from "./networks";
+import { randomBytes } from "crypto";
+import type { InsertRpcLog } from "@shared/schema";
 
 const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
+
+interface SerializedRpcLog {
+  requestId: string;
+  connectionId: number | null;
+  apiKeyLast4: string | null;
+  network: string;
+  method: string;
+  status: string;
+  statusCode: number | null;
+  latency: number;
+  requestBody: any;
+  responseBody: any;
+  errorMessage: string | null;
+  timestamp: string;
+}
+
+type LogEventCallback = (log: SerializedRpcLog) => void;
+const logEventListeners: Set<LogEventCallback> = new Set();
+
+export function subscribeToLogs(callback: LogEventCallback): () => void {
+  logEventListeners.add(callback);
+  return () => logEventListeners.delete(callback);
+}
+
+function emitLogEvent(log: InsertRpcLog & { timestamp: Date }) {
+  const serializedLog: SerializedRpcLog = {
+    requestId: log.requestId,
+    connectionId: log.connectionId ?? null,
+    apiKeyLast4: log.apiKeyLast4 ?? null,
+    network: log.network,
+    method: log.method,
+    status: log.status,
+    statusCode: log.statusCode ?? null,
+    latency: log.latency,
+    requestBody: log.requestBody,
+    responseBody: log.responseBody,
+    errorMessage: log.errorMessage ?? null,
+    timestamp: log.timestamp.toISOString(),
+  };
+  Array.from(logEventListeners).forEach(callback => {
+    try {
+      callback(serializedLog);
+    } catch (e) {
+      console.error("Log event listener error:", e);
+    }
+  });
+}
+
+function generateRequestId(): string {
+  return `req_${randomBytes(8).toString("hex")}`;
+}
 
 function sanitizeString(str: string): string {
   return str
@@ -139,8 +192,28 @@ export async function validateApiKey(
 export async function rpcProxyHandler(req: Request, res: Response) {
   const { network } = req.params;
   const connection = (req as any).connection;
+  const requestId = generateRequestId();
+  const apiKeyLast4 = connection?.apiKey?.slice(-4) || null;
+  const method = req.body?.method || "unknown";
   
   if (!ALCHEMY_API_KEY) {
+    const logEntry: InsertRpcLog & { timestamp: Date } = {
+      requestId,
+      connectionId: connection?.id || null,
+      apiKeyLast4,
+      network,
+      method,
+      status: "error",
+      statusCode: 503,
+      latency: 0,
+      requestBody: req.body,
+      responseBody: null,
+      errorMessage: "RPC service temporarily unavailable",
+      timestamp: new Date(),
+    };
+    storage.createRpcLog(logEntry).catch(console.error);
+    emitLogEvent(logEntry);
+    
     return res.status(503).json({
       jsonrpc: "2.0",
       error: {
@@ -153,6 +226,23 @@ export async function rpcProxyHandler(req: Request, res: Response) {
 
   const networkConfig = getNetworkBySlug(network);
   if (!networkConfig) {
+    const logEntry: InsertRpcLog & { timestamp: Date } = {
+      requestId,
+      connectionId: connection?.id || null,
+      apiKeyLast4,
+      network,
+      method,
+      status: "error",
+      statusCode: 400,
+      latency: 0,
+      requestBody: req.body,
+      responseBody: null,
+      errorMessage: `Unsupported network: ${network}`,
+      timestamp: new Date(),
+    };
+    storage.createRpcLog(logEntry).catch(console.error);
+    emitLogEvent(logEntry);
+    
     return res.status(400).json({
       jsonrpc: "2.0",
       error: {
@@ -165,6 +255,23 @@ export async function rpcProxyHandler(req: Request, res: Response) {
 
   const alchemyUrl = getAlchemyUrl(network, ALCHEMY_API_KEY);
   if (!alchemyUrl) {
+    const logEntry: InsertRpcLog & { timestamp: Date } = {
+      requestId,
+      connectionId: connection?.id || null,
+      apiKeyLast4,
+      network,
+      method,
+      status: "error",
+      statusCode: 400,
+      latency: 0,
+      requestBody: req.body,
+      responseBody: null,
+      errorMessage: `Network configuration error for: ${network}`,
+      timestamp: new Date(),
+    };
+    storage.createRpcLog(logEntry).catch(console.error);
+    emitLogEvent(logEntry);
+    
     return res.status(400).json({
       jsonrpc: "2.0",
       error: {
@@ -193,11 +300,30 @@ export async function rpcProxyHandler(req: Request, res: Response) {
     const data = await response.json();
     
     const sanitizedData = sanitizeResponse(data);
+    const hasError = !!data.error;
+    
+    const logEntry: InsertRpcLog & { timestamp: Date } = {
+      requestId,
+      connectionId: connection?.id || null,
+      apiKeyLast4,
+      network,
+      method,
+      status: hasError ? "error" : "success",
+      statusCode: response.status,
+      latency,
+      requestBody: req.body,
+      responseBody: sanitizedData,
+      errorMessage: hasError ? data.error?.message : null,
+      timestamp: new Date(),
+    };
+    storage.createRpcLog(logEntry).catch(console.error);
+    emitLogEvent(logEntry);
 
     res.set({
       "X-INFRA-Network": networkConfig.name,
-      "X-INFRA-ChainId": networkConfig.chainId.toString(),
+      "X-INFRA-ChainId": (networkConfig.chainId || 0).toString(),
       "X-INFRA-Latency": `${latency}ms`,
+      "X-INFRA-RequestId": requestId,
     });
 
     if (data.error) {
@@ -211,6 +337,23 @@ export async function rpcProxyHandler(req: Request, res: Response) {
     
   } catch (error: any) {
     console.error(`RPC proxy error for ${network}:`, error.message);
+    
+    const logEntry: InsertRpcLog & { timestamp: Date } = {
+      requestId,
+      connectionId: connection?.id || null,
+      apiKeyLast4,
+      network,
+      method,
+      status: "error",
+      statusCode: 502,
+      latency: 0,
+      requestBody: req.body,
+      responseBody: null,
+      errorMessage: error.message,
+      timestamp: new Date(),
+    };
+    storage.createRpcLog(logEntry).catch(console.error);
+    emitLogEvent(logEntry);
     
     return res.status(502).json({
       jsonrpc: "2.0",

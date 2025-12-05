@@ -1,8 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertConnectionSchema } from "@shared/schema";
-import { validateApiKey, rpcProxyHandler } from "./rpc-proxy";
+import { WebSocketServer, WebSocket } from "ws";
+import { storage, type LogsFilter } from "./storage";
+import { insertConnectionSchema, type RpcLog } from "@shared/schema";
+import { validateApiKey, rpcProxyHandler, subscribeToLogs } from "./rpc-proxy";
 import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
 import { generateCopilotResponse, getQuickSuggestions, generateSmartContract, fixContractErrors, type CopilotMessage, type CopilotContext, type ContractGenerationRequest, type ErrorFixRequest } from "./copilot";
 import { compileSolidity, getVerificationUrl, getExplorerTxUrl, getExplorerAddressUrl } from "./contract-compiler";
@@ -312,6 +313,78 @@ export async function registerRoutes(
         type: n.type,
       }));
     res.json(networks);
+  });
+
+  // RPC Logs API
+  app.get("/api/logs", async (req, res) => {
+    try {
+      const filter: LogsFilter = {
+        network: req.query.network as string | undefined,
+        method: req.query.method as string | undefined,
+        status: req.query.status as string | undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 100,
+        offset: req.query.offset ? parseInt(req.query.offset as string) : 0,
+      };
+      
+      if (req.query.since) {
+        filter.since = new Date(req.query.since as string);
+      }
+      
+      const logs = await storage.getRpcLogs(filter);
+      res.json(logs);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/logs/stats", async (req, res) => {
+    try {
+      const stats = await storage.getLogStats();
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/logs/recent", async (req, res) => {
+    try {
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const logs = await storage.getRecentLogs(limit);
+      res.json(logs);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // WebSocket for live log streaming
+  const wss = new WebSocketServer({ server: httpServer, path: "/ws/logs" });
+  
+  wss.on("connection", (ws: WebSocket) => {
+    console.log("WebSocket client connected for logs");
+    
+    // Send recent logs on connection
+    storage.getRecentLogs(20).then((logs) => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "initial", logs }));
+      }
+    }).catch(console.error);
+    
+    // Subscribe to new logs
+    const unsubscribe = subscribeToLogs((log) => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "log", log }));
+      }
+    });
+    
+    ws.on("close", () => {
+      console.log("WebSocket client disconnected");
+      unsubscribe();
+    });
+    
+    ws.on("error", (error) => {
+      console.error("WebSocket error:", error);
+      unsubscribe();
+    });
   });
 
   return httpServer;
