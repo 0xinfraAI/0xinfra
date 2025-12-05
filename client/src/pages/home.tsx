@@ -368,9 +368,9 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-4">
             <span className="text-primary font-bold">[ CONNECT ]</span>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">Twitter</a>
+            <a href="https://x.com/0xinfra_" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">Twitter</a>
             <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">Discord</a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">GitHub</a>
+            <a href="https://github.com/0xinfraAI/0xinfra" target="_blank" rel="noopener noreferrer" className="hover:text-white text-neutral-400">GitHub</a>
           </div>
         </div>
       </footer>

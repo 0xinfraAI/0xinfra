@@ -427,6 +427,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 **Built with 💚 by the 0xinfra team**
 
-[Website](https://0xinfra.online) · [Twitter](https://twitter.com/0xinfra) · [Discord](https://discord.gg/0xinfra)
+[Website](https://0xinfra.online) · [Twitter](https://x.com/0xinfra_) · [GitHub](https://github.com/0xinfraAI/0xinfra)
 
 </div>
