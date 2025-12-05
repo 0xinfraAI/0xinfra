@@ -7,7 +7,7 @@ import { validateApiKey, rpcProxyHandler, subscribeToLogs } from "./rpc-proxy";
 import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
 import { generateCopilotResponse, getQuickSuggestions, generateSmartContract, fixContractErrors, type CopilotMessage, type CopilotContext, type ContractGenerationRequest, type ErrorFixRequest } from "./copilot";
 import { compileSolidity, getVerificationUrl, getExplorerTxUrl, getExplorerAddressUrl } from "./contract-compiler";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupEmailAuth, isAuthenticated } from "./emailAuth";
 
 interface NetworkStatus {
   slug: string;
@@ -95,20 +95,8 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // Setup authentication (must be first)
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+  // Setup email-based authentication (must be first)
+  await setupEmailAuth(app);
 
   // Get available networks (public)
   app.get("/api/networks", (req, res) => {
@@ -172,7 +160,7 @@ export async function registerRoutes(
   // Connection management (protected routes)
   app.post("/api/connections", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const validated = insertConnectionSchema.parse({
         ...req.body,
         userId,
@@ -186,7 +174,7 @@ export async function registerRoutes(
 
   app.get("/api/connections", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       const connections = await storage.getConnectionsByUser(userId);
       res.json(connections);
     } catch (error: any) {
@@ -202,7 +190,7 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Connection not found" });
       }
       // Verify ownership
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       if (connection.userId !== userId) {
         return res.status(403).json({ error: "Access denied" });
       }
@@ -220,7 +208,7 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Connection not found" });
       }
       // Verify ownership
-      const userId = req.user.claims.sub;
+      const userId = req.user.id;
       if (connection.userId !== userId) {
         return res.status(403).json({ error: "Access denied" });
       }
