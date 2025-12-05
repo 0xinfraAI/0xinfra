@@ -14,6 +14,8 @@ import CopilotPage from "@/pages/copilot";
 import DeployPage from "@/pages/deploy";
 import LogsPage from "@/pages/logs";
 import AccountPage from "@/pages/account";
+import Login from "@/pages/login";
+import Register from "@/pages/register";
 
 function Router() {
   return (
@@ -28,6 +30,8 @@ function Router() {
       <Route path="/deploy" component={DeployPage} />
       <Route path="/logs" component={LogsPage} />
       <Route path="/account" component={AccountPage} />
+      <Route path="/login" component={Login} />
+      <Route path="/register" component={Register} />
       <Route component={NotFound} />
     </Switch>
   );
