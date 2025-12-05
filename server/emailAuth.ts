@@ -20,14 +20,26 @@ export function getSession() {
     ttl: sessionTtl,
     tableName: "sessions",
   });
+  
+  const sessionSecret = process.env.SESSION_SECRET;
+  const isProduction = process.env.NODE_ENV === "production";
+  
+  if (isProduction && !sessionSecret) {
+    throw new Error("SESSION_SECRET environment variable is required in production");
+  }
+  
+  if (!sessionSecret) {
+    console.warn("⚠️  Using default session secret. Set SESSION_SECRET for production.");
+  }
+  
   return session({
-    secret: process.env.SESSION_SECRET || "0xinfra-secret-key-change-in-production",
+    secret: sessionSecret || "dev-session-secret-0xinfra",
     store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProduction,
       maxAge: sessionTtl,
       sameSite: "lax",
     },
