@@ -2,6 +2,8 @@ import { ArrowRight, LogOut, User, Settings, ChevronDown } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { getTrialDaysRemaining, isTrialActive } from "@/lib/authUtils";
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 
 interface NavigationProps {
   transparent?: boolean;
@@ -10,6 +12,28 @@ interface NavigationProps {
 export function Navigation({ transparent = false }: NavigationProps) {
   const { user, isLoading, isAuthenticated } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (!response.ok) throw new Error("Logout failed");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      setLocation("/");
+    },
+  });
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
+    setDropdownOpen(false);
+  };
 
   const trialDays = user?.trialEnd ? getTrialDaysRemaining(user.trialEnd) : 0;
   const trialActive = user?.trialEnd ? isTrialActive(user.trialEnd) : false;
@@ -115,14 +139,14 @@ export function Navigation({ transparent = false }: NavigationProps) {
                     </a>
                   </div>
                   <div className="border-t border-border py-2">
-                    <a 
-                      href="/api/logout" 
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 text-red-400 transition-colors"
+                    <button 
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-500/10 text-red-400 transition-colors"
                       data-testid="dropdown-logout-link"
                     >
                       <LogOut className="w-4 h-4" />
                       <span className="font-mono text-sm">Sign Out</span>
-                    </a>
+                    </button>
                   </div>
                 </div>
               </>
@@ -130,7 +154,7 @@ export function Navigation({ transparent = false }: NavigationProps) {
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <a href="/api/login">
+            <a href="/login">
               <button 
                 className="font-mono text-sm hover:text-primary transition-colors px-4 py-2"
                 data-testid="login-button"
@@ -138,7 +162,7 @@ export function Navigation({ transparent = false }: NavigationProps) {
                 LOG IN
               </button>
             </a>
-            <a href="/api/login">
+            <a href="/register">
               <button 
                 className="bg-primary text-black font-mono font-bold px-6 py-2 text-sm hover:bg-white transition-colors flex items-center gap-2 border border-transparent hover:border-black"
                 data-testid="signup-button"
