@@ -2,56 +2,49 @@ import { motion } from "framer-motion";
 import { Activity, Zap, Globe, Shield, Plus, Copy, Trash2, RefreshCw, Check, Terminal, ArrowRight } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Connection } from "@shared/schema";
-
-function Navigation() {
-  return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
-      <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-        <div className="w-3 h-3 bg-primary animate-pulse" />
-        <span className="font-mono font-bold text-lg tracking-widest">0xinfra</span>
-      </a>
-      
-      <div className="hidden md:flex items-center gap-8 font-mono text-sm">
-        {[
-          { label: 'NODES', href: '/nodes' },
-          { label: 'DEPLOY', href: '/deploy' },
-          { label: 'AI COPILOT', href: '/copilot' },
-          { label: 'PRICING', href: '/pricing' },
-          { label: 'DASHBOARD', href: '/dashboard' },
-        ].map((item) => (
-          <a 
-            key={item.label} 
-            href={item.href} 
-            className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors"
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
-
-      <a href="/connect">
-        <button className="bg-primary text-black font-mono font-bold px-6 py-2 text-sm hover:bg-white transition-colors flex items-center gap-2 border border-transparent hover:border-black">
-          CONNECT <ArrowRight className="w-4 h-4" />
-        </button>
-      </a>
-    </nav>
-  );
-}
+import { Navigation } from "@/components/Navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { isUnauthorizedError } from "@/lib/authUtils";
 
 export default function Dashboard() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to view your dashboard.",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+    }
+  }, [isAuthenticated, authLoading, toast]);
   const queryClient = useQueryClient();
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const { data: connections, isLoading, refetch } = useQuery<Connection[]>({
-    queryKey: ["connections"],
-    queryFn: async () => {
-      const response = await fetch("/api/connections");
-      if (!response.ok) throw new Error("Failed to fetch connections");
-      return response.json();
-    },
+  const { data: connections, isLoading, refetch, error } = useQuery<Connection[]>({
+    queryKey: ["/api/connections"],
+    enabled: isAuthenticated,
   });
+
+  useEffect(() => {
+    if (error && isUnauthorizedError(error)) {
+      toast({
+        title: "Session expired",
+        description: "Please sign in again.",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+    }
+  }, [error, toast]);
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {

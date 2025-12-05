@@ -13,6 +13,7 @@ import Dashboard from "@/pages/dashboard";
 import CopilotPage from "@/pages/copilot";
 import DeployPage from "@/pages/deploy";
 import LogsPage from "@/pages/logs";
+import AccountPage from "@/pages/account";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/copilot" component={CopilotPage} />
       <Route path="/deploy" component={DeployPage} />
       <Route path="/logs" component={LogsPage} />
+      <Route path="/account" component={AccountPage} />
       <Route component={NotFound} />
     </Switch>
   );

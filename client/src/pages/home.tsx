@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Terminal, Zap, Shield, Network, Activity, Cpu, Globe } from "lucide-react";
 import heroBg from "@assets/generated_images/abstract_wireframe_topographic_map_with_acid_green_lines_on_black.png";
+import { Navigation } from "@/components/Navigation";
 
 const Marquee = ({ text }: { text: string }) => (
   <div className="w-full overflow-hidden bg-primary text-black py-2 border-y border-black">
@@ -35,37 +36,7 @@ const Stat = ({ label, value }: { label: string, value: string }) => (
 export default function Home() {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary selection:text-black">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 bg-primary animate-pulse" />
-          <span className="font-mono font-bold text-lg tracking-widest">0xinfra</span>
-        </div>
-        
-        <div className="hidden md:flex items-center gap-8 font-mono text-sm">
-          {[
-            { label: 'NODES', href: '/nodes' },
-            { label: 'DEPLOY', href: '/deploy' },
-            { label: 'AI COPILOT', href: '/copilot' },
-            { label: 'PRICING', href: '/pricing' },
-            { label: 'DASHBOARD', href: '/dashboard' },
-          ].map((item) => (
-            <a 
-              key={item.label} 
-              href={item.href} 
-              className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors"
-            >
-              {item.label}
-            </a>
-          ))}
-        </div>
-
-        <a href="/connect">
-          <button className="bg-primary text-black font-mono font-bold px-6 py-2 text-sm hover:bg-white transition-colors flex items-center gap-2 border border-transparent hover:border-black">
-            CONNECT <ArrowRight className="w-4 h-4" />
-          </button>
-        </a>
-      </nav>
+      <Navigation transparent />
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col pt-16 border-b border-border">

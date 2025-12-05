@@ -4,40 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { CopilotProvider } from "@/components/copilot";
-
-function Navigation() {
-  return (
-    <nav className="fixed top-0 left-0 w-full z-50 bg-background/90 backdrop-blur-sm border-b border-border flex items-center justify-between px-4 md:px-8 h-16">
-      <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-        <div className="w-3 h-3 bg-primary animate-pulse" />
-        <span className="font-mono font-bold text-lg tracking-widest">0xinfra</span>
-      </a>
-      
-      <div className="hidden md:flex items-center gap-8 font-mono text-sm">
-        {[
-          { label: 'NODES', href: '/nodes' },
-          { label: 'DEPLOY', href: '/deploy' },
-          { label: 'AI COPILOT', href: '/copilot' },
-          { label: 'PRICING', href: '/pricing' },
-          { label: 'DASHBOARD', href: '/dashboard' },
-        ].map((item) => (
-          <a 
-            key={item.label} 
-            href={item.href} 
-            className="hover:text-primary hover:underline decoration-primary underline-offset-4 transition-colors"
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
-
-      <a href="/" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors font-mono text-sm">
-        <Home className="w-4 h-4" />
-        <span className="hidden md:inline">HOME</span>
-      </a>
-    </nav>
-  );
-}
+import { Navigation } from "@/components/Navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import type { Connection } from "@shared/schema";
 
 const NETWORKS = [
   { slug: "ethereum", name: "Ethereum", chainId: 1, blockTime: "12s", icon: "ETH", color: "#627EEA" },
@@ -189,6 +159,9 @@ function CodeSnippet({ language, code, onCopy }: { language: string; code: strin
 }
 
 export default function Connect() {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
+  
   const [mode, setMode] = useState<"quick" | "advanced">("quick");
   const [selectedNetwork, setSelectedNetwork] = useState("ethereum");
   const [selectedTab, setSelectedTab] = useState<"curl" | "javascript" | "python">("curl");
@@ -205,12 +178,22 @@ export default function Connect() {
   const [connectionData, setConnectionData] = useState<any>(null);
   const [quickApiKey, setQuickApiKey] = useState<string | null>(null);
 
-  const { data: connections } = useQuery({
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to create API keys.",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 500);
+    }
+  }, [isAuthenticated, authLoading, toast]);
+
+  const { data: connections } = useQuery<Connection[]>({
     queryKey: ["/api/connections"],
-    queryFn: async () => {
-      const res = await fetch("/api/connections");
-      return res.json();
-    },
+    enabled: isAuthenticated,
   });
 
   const existingKey = connections?.[0]?.apiKey || quickApiKey;

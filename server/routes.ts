@@ -7,6 +7,7 @@ import { validateApiKey, rpcProxyHandler, subscribeToLogs } from "./rpc-proxy";
 import { getAllNetworks, getNetworkBySlug, getAlchemyUrl, getMainnetNetworks } from "./networks";
 import { generateCopilotResponse, getQuickSuggestions, generateSmartContract, fixContractErrors, type CopilotMessage, type CopilotContext, type ContractGenerationRequest, type ErrorFixRequest } from "./copilot";
 import { compileSolidity, getVerificationUrl, getExplorerTxUrl, getExplorerAddressUrl } from "./contract-compiler";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 interface NetworkStatus {
   slug: string;
@@ -94,7 +95,22 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // Get available networks
+  // Setup authentication (must be first)
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Get available networks (public)
   app.get("/api/networks", (req, res) => {
     const networks = getAllNetworks().map(n => ({
       name: n.name,
@@ -106,7 +122,7 @@ export async function registerRoutes(
     res.json(networks);
   });
 
-  // Get live network status with connectivity checks
+  // Get live network status with connectivity checks (public)
   app.get("/api/network-status", async (req, res) => {
     try {
       const networks = getAllNetworks();
@@ -127,7 +143,7 @@ export async function registerRoutes(
     }
   });
 
-  // Get status for a single network
+  // Get status for a single network (public)
   app.get("/api/network-status/:slug", async (req, res) => {
     try {
       const network = getNetworkBySlug(req.params.slug);
@@ -149,15 +165,18 @@ export async function registerRoutes(
     }
   });
 
-  // RPC Proxy endpoint - validates API key and proxies to provider
-  // Supports both header-based auth (X-INFRA-KEY) and URL-based auth
+  // RPC Proxy endpoint - validates API key and proxies to provider (public - auth via API key)
   app.post("/rpc/:network", validateApiKey, rpcProxyHandler);
   app.post("/rpc/:network/:apiKey", validateApiKey, rpcProxyHandler);
 
-  // Connection management
-  app.post("/api/connections", async (req, res) => {
+  // Connection management (protected routes)
+  app.post("/api/connections", isAuthenticated, async (req: any, res) => {
     try {
-      const validated = insertConnectionSchema.parse(req.body);
+      const userId = req.user.claims.sub;
+      const validated = insertConnectionSchema.parse({
+        ...req.body,
+        userId,
+      });
       const connection = await storage.createConnection(validated);
       res.json(connection);
     } catch (error: any) {
@@ -165,21 +184,27 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/connections", async (req, res) => {
+  app.get("/api/connections", isAuthenticated, async (req: any, res) => {
     try {
-      const connections = await storage.getAllConnections();
+      const userId = req.user.claims.sub;
+      const connections = await storage.getConnectionsByUser(userId);
       res.json(connections);
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  app.get("/api/connections/:id", async (req, res) => {
+  app.get("/api/connections/:id", isAuthenticated, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
       const connection = await storage.getConnection(id);
       if (!connection) {
         return res.status(404).json({ error: "Connection not found" });
+      }
+      // Verify ownership
+      const userId = req.user.claims.sub;
+      if (connection.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
       }
       res.json(connection);
     } catch (error: any) {
@@ -187,9 +212,18 @@ export async function registerRoutes(
     }
   });
 
-  app.delete("/api/connections/:id", async (req, res) => {
+  app.delete("/api/connections/:id", isAuthenticated, async (req: any, res) => {
     try {
       const id = parseInt(req.params.id);
+      const connection = await storage.getConnection(id);
+      if (!connection) {
+        return res.status(404).json({ error: "Connection not found" });
+      }
+      // Verify ownership
+      const userId = req.user.claims.sub;
+      if (connection.userId !== userId) {
+        return res.status(403).json({ error: "Access denied" });
+      }
       await storage.deactivateConnection(id);
       res.json({ success: true });
     } catch (error: any) {
@@ -197,7 +231,7 @@ export async function registerRoutes(
     }
   });
 
-  // AI Copilot endpoints
+  // AI Copilot endpoints (public for now, can be protected later)
   app.post("/api/copilot/chat", async (req, res) => {
     try {
       const { messages, context } = req.body as {
@@ -228,7 +262,7 @@ export async function registerRoutes(
     res.json({ suggestions });
   });
 
-  // Specialized AI Contract Generator (A+ Quality)
+  // Specialized AI Contract Generator
   app.post("/api/copilot/generate-contract", async (req, res) => {
     try {
       const { prompt, network, contractType } = req.body as ContractGenerationRequest;
@@ -245,7 +279,7 @@ export async function registerRoutes(
     }
   });
 
-  // Specialized AI Error Fixer (A+ Quality)
+  // Specialized AI Error Fixer
   app.post("/api/copilot/fix-errors", async (req, res) => {
     try {
       const { sourceCode, errors, network } = req.body as ErrorFixRequest;
@@ -266,7 +300,7 @@ export async function registerRoutes(
     }
   });
 
-  // Smart Contract Compilation API
+  // Smart Contract Compilation API (public)
   app.post("/api/contracts/compile", (req, res) => {
     try {
       const { sourceCode, fileName } = req.body;
@@ -302,7 +336,7 @@ export async function registerRoutes(
     });
   });
 
-  // Get EVM networks for deployment (exclude Solana)
+  // Get EVM networks for deployment
   app.get("/api/contracts/networks", (req, res) => {
     const networks = getAllNetworks()
       .filter(n => n.ecosystem === "evm")
@@ -315,8 +349,8 @@ export async function registerRoutes(
     res.json(networks);
   });
 
-  // RPC Logs API
-  app.get("/api/logs", async (req, res) => {
+  // RPC Logs API (protected)
+  app.get("/api/logs", isAuthenticated, async (req, res) => {
     try {
       const filter: LogsFilter = {
         network: req.query.network as string | undefined,
@@ -337,7 +371,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/logs/stats", async (req, res) => {
+  app.get("/api/logs/stats", isAuthenticated, async (req, res) => {
     try {
       const stats = await storage.getLogStats();
       res.json(stats);
@@ -346,7 +380,7 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/logs/recent", async (req, res) => {
+  app.get("/api/logs/recent", isAuthenticated, async (req, res) => {
     try {
       const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
       const logs = await storage.getRecentLogs(limit);

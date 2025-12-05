@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type Connection, type InsertConnection, type RpcLog, type InsertRpcLog, connections, users, rpcLogs } from "@shared/schema";
+import { type User, type UpsertUser, type Connection, type InsertConnection, type RpcLog, type InsertRpcLog, connections, users, rpcLogs } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, like, or } from "drizzle-orm";
 import { randomBytes } from "crypto";
@@ -13,17 +13,21 @@ export interface LogsFilter {
 }
 
 export interface IStorage {
+  // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  updateUserApiCalls(id: string, callsUsed: number): Promise<void>;
   
+  // Connection operations
   createConnection(connection: InsertConnection): Promise<Connection>;
   getConnection(id: number): Promise<Connection | undefined>;
   getConnectionByApiKey(apiKey: string): Promise<Connection | undefined>;
   getAllConnections(): Promise<Connection[]>;
+  getConnectionsByUser(userId: string): Promise<Connection[]>;
   incrementRequestCount(id: number): Promise<void>;
   deactivateConnection(id: number): Promise<void>;
   
+  // RPC Logs operations
   createRpcLog(log: InsertRpcLog): Promise<RpcLog>;
   getRpcLogs(filter?: LogsFilter): Promise<RpcLog[]>;
   getRecentLogs(limit?: number): Promise<RpcLog[]>;
@@ -40,17 +44,40 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    // Set trial period for new users (7 days)
+    const now = new Date();
+    const trialEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values({
+        ...userData,
+        trialStart: now,
+        trialEnd: trialEnd,
+        planType: "trial",
+        apiCallsUsed: 0,
+        apiCallsLimit: 100000,
+      })
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: userData.profileImageUrl,
+          updatedAt: new Date(),
+        },
+      })
       .returning();
     return user;
+  }
+
+  async updateUserApiCalls(id: string, callsUsed: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ apiCallsUsed: callsUsed, updatedAt: new Date() })
+      .where(eq(users.id, id));
   }
 
   async createConnection(insertConnection: InsertConnection): Promise<Connection> {
@@ -83,6 +110,10 @@ export class DatabaseStorage implements IStorage {
 
   async getAllConnections(): Promise<Connection[]> {
     return db.select().from(connections);
+  }
+
+  async getConnectionsByUser(userId: string): Promise<Connection[]> {
+    return db.select().from(connections).where(eq(connections.userId, userId));
   }
 
   async incrementRequestCount(id: number): Promise<void> {
