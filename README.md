@@ -42,7 +42,7 @@
 | 📝 **Smart Contract IDE** | Remix-style editor with file management, compilation, and deployment |
 | 🤖 **AI Copilot** | GPT-powered Solidity development assistant |
 | 📊 **Live Logs** | Real-time RPC request monitoring with WebSocket streaming |
-| 📚 **Documentation** | Alchemy-style docs with interactive examples and Mermaid diagrams |
+| 📚 **Documentation** | Dynamic-style docs with interactive examples and Mermaid diagrams |
 | 🔐 **Auth System** | Email/password authentication with 7-day trial activation |
 | 💰 **Tiered Pricing** | Free, Pro, and Enterprise plans with usage-based limits |
 
@@ -262,8 +262,8 @@ npm run dev
 ```env
 DATABASE_URL=postgresql://user:pass@host:5432/db
 SESSION_SECRET=your-secure-session-secret
-OPENAI_API_KEY=sk-...
-ALCHEMY_API_KEY=your-alchemy-key
+0INFRA_API_KEY=sk-...
+0INFRA_API_KEY=your-alchemy-key
 ```
 
 ---
